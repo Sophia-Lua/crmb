@@ -411,7 +411,203 @@ src/
 
 ---
 
-## 第六部分：开发计划
+## 第六部分：Mock 数据方案
+
+### 6.1 Mock 配置
+
+```javascript
+// src/mock/warehouse.js
+import Mock from 'mockjs';
+
+// 出库单 Mock
+Mock.mock(/\/api\/warehouse\/out-orders(\?.*)?$/, 'get', (options) => {
+  const params = new URLSearchParams(options.url.split('?')[1]);
+  const page = parseInt(params.get('page')) || 1;
+  const pageSize = parseInt(params.get('pageSize')) || 20;
+  
+  const outOrders = Mock.mock({
+    'list|50': [{
+      'id|+1': 1,
+      'orderNo': '@string("OUT", 8)',
+      'type|1': ['order', 'return', 'manual'],
+      'warehouseId|1-5': 1,
+      'status|1': ['pending', 'picking', 'confirmed', 'completed', 'cancelled'],
+      'operatorId|1-20': 1,
+      'operatorName': '@cname',
+      'items|1-10': [{
+        'sku': '@string("SKU", 8)',
+        'productName': '@ctitle(5,10)',
+        'quantity|1-100': 1,
+        'locationId': '@string("LOC", 6)'
+      }],
+      'createdAt': '@datetime'
+    }]
+  });
+  
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize;
+  
+  return {
+    code: 200,
+    message: 'success',
+    data: {
+      list: outOrders.list.slice(start, end),
+      total: outOrders.list.length,
+      page,
+      pageSize
+    }
+  };
+});
+
+// 库存数据 Mock
+Mock.mock(/\/api\/warehouse\/inventory(\?.*)?$/, 'get', (options) => {
+  const params = new URLSearchParams(options.url.split('?')[1]);
+  const page = parseInt(params.get('page')) || 1;
+  const pageSize = parseInt(params.get('pageSize')) || 20;
+  
+  const inventory = Mock.mock({
+    'list|100': [{
+      'id|+1': 1,
+      'sku': '@string("SKU", 8)',
+      'productName': '@ctitle(5,10)',
+      'warehouseId|1-5': 1,
+      'warehouseName': '@ctitle(2,4)仓库',
+      'locationId': '@string("LOC", 6)',
+      'locationName': '@string("A", 3)-@integer(1,10)-@integer(1,10)',
+      'quantity|0-1000': 1,
+      'lockedQty|0-100': 1,
+      'availableQty': function() {
+        return this.quantity - this.lockedQty;
+      },
+      'warningQty|10-50': 1,
+      'staleDays|0-365': 1,
+      'lastInDate': '@date',
+      'lastOutDate': '@date'
+    }]
+  });
+  
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize;
+  
+  return {
+    code: 200,
+    message: 'success',
+    data: {
+      list: inventory.list.slice(start, end),
+      total: inventory.list.length,
+      page,
+      pageSize
+    }
+  };
+});
+```
+
+---
+
+## 第七部分：权限控制
+
+### 7.1 路由权限
+
+```javascript
+// src/router/permission.js
+const routePermissions = {
+  'warehouse:out-orders:view': ['/warehouse/out-orders', '/warehouse/out-orders/:id'],
+  'warehouse:out-orders:create': ['/warehouse/out-orders/create'],
+  'warehouse:out-orders:confirm': ['/warehouse/out-orders/:id/confirm'],
+  'warehouse:in-orders:view': ['/warehouse/in-orders', '/warehouse/in-orders/:id'],
+  'warehouse:in-orders:create': ['/warehouse/in-orders/create'],
+  'warehouse:in-orders:confirm': ['/warehouse/in-orders/:id/confirm'],
+  'warehouse:inventory:view': ['/warehouse/inventory'],
+  'warehouse:stocktake:view': ['/warehouse/stocktake', '/warehouse/stocktake/:id'],
+  'warehouse:stocktake:create': ['/warehouse/stocktake/create'],
+  'warehouse:locations:view': ['/warehouse/locations'],
+  'warehouse:locations:create': ['/warehouse/locations/create'],
+  'warehouse:admin:view': ['/warehouse/admin']
+};
+
+router.beforeEach((to, from, next) => {
+  const userPermissions = getUserPermissions();
+  const requiredPermission = getRoutePermission(to.path);
+  
+  if (requiredPermission && !userPermissions.includes(requiredPermission)) {
+    next('/403');
+  } else {
+    next();
+  }
+});
+```
+
+### 7.2 按钮权限
+
+```vue
+<template>
+  <!-- 出库管理 -->
+  <el-button
+    v-permission="'warehouse:out-orders:create'"
+    type="primary"
+    @click="handleCreateOutOrder"
+  >
+    创建出库单
+  </el-button>
+  
+  <el-button
+    v-permission="'warehouse:out-orders:confirm'"
+    @click="handleConfirmOutOrder"
+  >
+    确认出库
+  </el-button>
+  
+  <!-- 库存管理 -->
+  <el-button
+    v-permission="'warehouse:stocktake:create'"
+    @click="handleCreateStocktake"
+  >
+    创建盘点单
+  </el-button>
+</template>
+```
+
+### 7.3 数据权限
+
+- **仓管员**: 只能操作自己负责的仓库
+- **仓库主管**: 可以管理本仓库所有数据
+- **管理员**: 拥有全部仓库权限
+
+---
+
+## 第八部分：注意事项
+
+### 8.1 开发规范
+
+1. **代码风格**: 遵循 ESLint + Prettier 配置
+2. **组件命名**: 使用 PascalCase 命名组件
+3. **注释规范**: 关键逻辑必须添加中文注释
+4. **错误处理**: 所有 API 调用必须捕获错误
+
+### 8.2 性能优化
+
+1. **列表虚拟化**: 大数据量库存列表使用虚拟滚动
+2. **图片懒加载**: 商品图片使用懒加载
+3. **接口防抖**: 库存搜索输入防抖 500ms
+4. **数据缓存**: 库存数据缓存 1 分钟（实时性要求高）
+
+### 8.3 安全控制
+
+1. **XSS 防护**: 商品名称等文本内容必须过滤
+2. **CSRF 防护**: API 请求携带 CSRF token
+3. **数据脱敏**: 敏感信息前端脱敏显示
+4. **权限验证**: 严格的仓库数据权限控制
+
+### 8.4 移动端适配
+
+1. **UniApp兼容**: 仓管员移动端操作界面
+2. **扫码功能**: 支持商品条码扫描
+3. **离线支持**: 关键操作支持离线模式
+4. **性能优化**: 移动端简化复杂操作流程
+
+---
+
+## 第九部分：开发计划
 
 | 阶段 | 内容 | 工期 |
 |------|------|------|
@@ -419,5 +615,7 @@ src/
 | 2 | 入库管理 | 4 天 |
 | 3 | 库存管理 | 4 天 |
 | 4 | 行政管理 | 2 天 |
-| 5 | 联调测试 | 3 天 |
-| **总计** | | **17 天** |
+| 5 | 权限控制 | 1 天 |
+| 6 | 移动端适配 | 2 天 |
+| 7 | 联调测试 | 3 天 |
+| **总计** | | **20 天** |

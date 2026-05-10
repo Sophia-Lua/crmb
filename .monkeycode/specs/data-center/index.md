@@ -399,9 +399,206 @@ const chartOption = computed(() => ({
 </script>
 ```
 
+### 5.2 图表组件
+
+```vue
+<template>
+  <div class="chart-container">
+    <v-chart :option="chartOption" autoresize />
+  </div>
+</template>
+
+<script setup>
+import { use } from 'echarts/core';
+import { CanvasRenderer } from 'echarts/renderers';
+import { LineChart, BarChart, PieChart } from 'echarts/charts';
+import VChart from 'vue-echarts';
+
+use([CanvasRenderer, LineChart, BarChart, PieChart]);
+
+const props = defineProps({
+  type: String,
+  data: Array
+});
+
+const chartOption = computed(() => ({
+  // 根据 type 返回不同配置
+}));
+</script>
+```
+
 ---
 
-## 第六部分：开发计划
+## 第六部分：Mock 数据方案
+
+### 6.1 Mock 配置
+
+```javascript
+// src/mock/dataCenter.js
+import Mock from 'mockjs';
+
+// 营业额数据 Mock
+Mock.mock(/\/api\/data-center\/revenue(\?.*)?$/, 'get', (options) => {
+  const params = new URLSearchParams(options.url.split('?')[1]);
+  const dateRange = params.get('dateRange') || 'month';
+  
+  const revenueData = Mock.mock({
+    'list|30': [{
+      'date': '@date',
+      'city|1': ['北京', '上海', '广州', '深圳'],
+      'region|1': ['朝阳区', '浦东新区', '天河区', '南山区'],
+      'totalRevenue|10000-100000': 1,
+      'orderCount|50-500': 1,
+      'avgOrderAmount|200-500': 1,
+      'payTypeBreakdown': {
+        'wechat|40-60': 1,
+        'alipay|20-40': 1,
+        'balance|10-20': 1,
+        'cash|5-10': 1
+      }
+    }]
+  });
+  
+  return {
+    code: 200,
+    message: 'success',
+    data: {
+      list: revenueData.list,
+      summary: {
+        totalRevenue: Mock.Random.float(1000000, 5000000, 2),
+        totalOrders: Mock.Random.integer(10000, 50000),
+        avgOrderAmount: Mock.Random.float(200, 500, 2)
+      }
+    }
+  };
+});
+
+// 商品销量 Mock
+Mock.mock(/\/api\/data-center\/product-sales(\?.*)?$/, 'get', (options) => {
+  const params = new URLSearchParams(options.url.split('?')[1]);
+  
+  const productSales = Mock.mock({
+    'list|100': [{
+      'sku': '@string("SKU", 8)',
+      'productName': '@ctitle(5,10)',
+      'categoryId|1-20': 1,
+      'categoryName': '@ctitle(2,4)',
+      'salesQty|100-10000': 1,
+      'salesAmount|1000-100000': 1,
+      'refundQty|0-100': 1,
+      'netSalesQty|90-9900': 1,
+      'profitAmount|100-50000': 1,
+      'trend|1': ['up', 'down', 'stable']
+    }]
+  });
+  
+  return {
+    code: 200,
+    message: 'success',
+    data: {
+      list: productSales.list,
+      ranking: productSales.list.sort((a, b) => b.salesQty - a.salesQty).slice(0, 10)
+    }
+  };
+});
+
+// 区域业绩 Mock
+Mock.mock(/\/api\/data-center\/region-performance(\?.*)?$/, 'get', () => {
+  const regions = Mock.mock({
+    'list|20': [{
+      'regionId|+1': 1,
+      'regionName': '@city(true)',
+      'revenue|100000-1000000': 1,
+      'orderCount|1000-10000': 1,
+      'customerCount|100-1000': 1,
+      'avgOrderAmount|200-500': 1,
+      'growthRate|-10-20': 1,
+      'ranking|+1': 1
+    }]
+  });
+  
+  return {
+    code: 200,
+    message: 'success',
+    data: {
+      list: regions.list.sort((a, b) => b.revenue - a.revenue),
+      topRegions: regions.list.slice(0, 5)
+    }
+  };
+});
+```
+
+---
+
+## 第七部分：权限控制
+
+### 7.1 路由权限
+
+```javascript
+// src/router/permission.js
+const routePermissions = {
+  'data-center:revenue:view': ['/data-center/revenue'],
+  'data-center:product-sales:view': ['/data-center/product-sales'],
+  'data-center:region-performance:view': ['/data-center/region-performance'],
+  'data-center:staff-performance:view': ['/data-center/staff-performance'],
+  'data-center:staff-cost:view': ['/data-center/staff-cost'],
+  'data-center:price-history:view': ['/data-center/product-history-price'],
+  'data-center:current-cost:view': ['/data-center/product-current-cost']
+};
+
+router.beforeEach((to, from, next) => {
+  const userPermissions = getUserPermissions();
+  const requiredPermission = getRoutePermission(to.path);
+  
+  if (requiredPermission && !userPermissions.includes(requiredPermission)) {
+    next('/403');
+  } else {
+    next();
+  }
+});
+```
+
+### 7.2 数据权限
+
+- **普通员工**: 只能查看自己部门的数据
+- **部门主管**: 可以查看本部门所有数据
+- **管理层**: 可以查看全局数据
+- **管理员**: 拥有全部权限
+
+---
+
+## 第八部分：注意事项
+
+### 8.1 开发规范
+
+1. **代码风格**: 遵循 ESLint + Prettier 配置
+2. **组件命名**: 使用 PascalCase 命名组件
+3. **注释规范**: 关键逻辑必须添加中文注释
+4. **错误处理**: 所有 API 调用必须捕获错误
+
+### 8.2 性能优化
+
+1. **大数据量处理**: 使用虚拟滚动和分页
+2. **图表渲染优化**: 使用 ECharts 的懒加载和节流
+3. **接口缓存**: 报表数据缓存 10 分钟
+4. **导出优化**: 大数据量导出使用后台任务
+
+### 8.3 安全控制
+
+1. **XSS 防护**: 图表数据必须过滤
+2. **CSRF 防护**: API 请求携带 CSRF token
+3. **数据脱敏**: 敏感信息前端脱敏显示
+4. **权限验证**: 严格的数据权限控制
+
+### 8.4 移动端适配
+
+1. **响应式设计**: 图表在移动端自适应
+2. **触摸优化**: 支持触摸操作的图表交互
+3. **性能考虑**: 移动端简化图表复杂度
+
+---
+
+## 第九部分：开发计划
 
 | 阶段 | 内容 | 工期 |
 |------|------|------|
@@ -409,5 +606,7 @@ const chartOption = computed(() => ({
 | 2 | 区域 + 人员业绩 | 3 天 |
 | 3 | 人员成本 | 2 天 |
 | 4 | 商品价格相关 | 2 天 |
-| 5 | 联调测试 | 2 天 |
-| **总计** | | **12 天** |
+| 5 | 权限控制 | 1 天 |
+| 6 | 性能优化 | 1 天 |
+| 7 | 联调测试 | 2 天 |
+| **总计** | | **14 天** |
