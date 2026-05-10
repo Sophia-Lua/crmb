@@ -418,41 +418,41 @@ interface Feedback {
 ## 第四部分：API 接口设计
 
 ```typescript
-// 基础路径：/api/v1/mall
+// 基础路径：/api/mall
 
 // 首页
-GET  /api/v1/mall/home/banner                         // 轮播图
-GET  /api/v1/mall/home/announcements                  // 公告
-GET  /api/v1/mall/home/recommend                       // 推荐商品
+GET  /api/mall/home/banner                         // 轮播图
+GET  /api/mall/home/announcements                  // 公告
+GET  /api/mall/home/recommend                       // 推荐商品
 
 // 商品
-GET  /api/v1/mall/products                            // 商品列表
-GET  /api/v1/mall/products/:id                        // 商品详情
-GET  /api/v1/mall/categories                          // 分类列表
+GET  /api/mall/products                            // 商品列表
+GET  /api/mall/products/:id                        // 商品详情
+GET  /api/mall/categories                          // 分类列表
 
 // 购物车
-GET  /api/v1/mall/cart                                // 购物车列表
-POST /api/v1/mall/cart/items                          // 添加商品
-PUT  /api/v1/mall/cart/items/:id                      // 更新数量
-DELETE /api/v1/mall/cart/items/:id                    // 删除商品
+GET  /api/mall/cart                                // 购物车列表
+POST /api/mall/cart/items                          // 添加商品
+PUT  /api/mall/cart/items/:id                      // 更新数量
+DELETE /api/mall/cart/items/:id                    // 删除商品
 
 // 订单
-GET  /api/v1/mall/orders                              // 订单列表
-GET  /api/v1/mall/orders/:id                          // 订单详情
-POST /api/v1/mall/orders                              // 创建订单
-POST /api/v1/mall/orders/:id/pay                      // 支付订单
+GET  /api/mall/orders                              // 订单列表
+GET  /api/mall/orders/:id                          // 订单详情
+POST /api/mall/orders                              // 创建订单
+POST /api/mall/orders/:id/pay                      // 支付订单
 
 // 售后
-POST /api/v1/mall/after-sales                         // 申请售后
-GET  /api/v1/mall/after-sales                         // 售后列表
+POST /api/mall/after-sales                         // 申请售后
+GET  /api/mall/after-sales                         // 售后列表
 
 // VIP
-GET  /api/v1/mall/vip/info                            // VIP 信息
-POST /api/v1/mall/vip/purchase                        // 购买 VIP
+GET  /api/mall/vip/info                            // VIP 信息
+POST /api/mall/vip/purchase                        // 购买 VIP
 
 // 客服
-GET  /api/v1/mall/customer-service/phone              // 客服电话
-POST /api/v1/mall/customer-service/feedback           // 提交反馈
+GET  /api/mall/customer-service/phone              // 客服电话
+POST /api/mall/customer-service/feedback           // 提交反馈
 ```
 
 ---

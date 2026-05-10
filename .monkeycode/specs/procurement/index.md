@@ -392,37 +392,37 @@ interface ReturnOrderItem {
 ## 第四部分：API 接口设计
 
 ```typescript
-// 基础路径：/api/v1/procurement
+// 基础路径：/api/procurement
 
 // 采购单
-GET  /api/v1/procurement/purchase-orders              // 采购单列表
-POST /api/v1/procurement/purchase-orders              // 创建采购单
-GET  /api/v1/procurement/purchase-orders/:id          // 采购单详情
-PUT  /api/v1/procurement/purchase-orders/:id/audit    // 审核采购单
-PUT  /api/v1/procurement/purchase-orders/:id/confirm  // 确认采购单
-PUT  /api/v1/procurement/purchase-orders/:id/cancel   // 取消采购单
+GET  /api/procurement/purchase-orders              // 采购单列表
+POST /api/procurement/purchase-orders              // 创建采购单
+GET  /api/procurement/purchase-orders/:id          // 采购单详情
+PUT  /api/procurement/purchase-orders/:id/audit    // 审核采购单
+PUT  /api/procurement/purchase-orders/:id/confirm  // 确认采购单
+PUT  /api/procurement/purchase-orders/:id/cancel   // 取消采购单
 
 // 供应商
-GET  /api/v1/procurement/suppliers                    // 供应商列表
-POST /api/v1/procurement/suppliers                    // 创建供应商
-GET  /api/v1/procurement/suppliers/:id                // 供应商详情
-PUT  /api/v1/procurement/suppliers/:id                // 编辑供应商
+GET  /api/procurement/suppliers                    // 供应商列表
+POST /api/procurement/suppliers                    // 创建供应商
+GET  /api/procurement/suppliers/:id                // 供应商详情
+PUT  /api/procurement/suppliers/:id                // 编辑供应商
 
 // 结算
-GET  /api/v1/procurement/settlements                  // 结算列表
-POST /api/v1/procurement/settlements                  // 创建结算
-PUT  /api/v1/procurement/settlements/:id/confirm      // 确认结算
-PUT  /api/v1/procurement/settlements/:id/pay          // 申请付款
+GET  /api/procurement/settlements                  // 结算列表
+POST /api/procurement/settlements                  // 创建结算
+PUT  /api/procurement/settlements/:id/confirm      // 确认结算
+PUT  /api/procurement/settlements/:id/pay          // 申请付款
 
 // 罚单
-GET  /api/v1/procurement/penalties                    // 罚单列表
-POST /api/v1/procurement/penalties                    // 创建罚单
-PUT  /api/v1/procurement/penalties/:id/confirm        // 确认罚单
+GET  /api/procurement/penalties                    // 罚单列表
+POST /api/procurement/penalties                    // 创建罚单
+PUT  /api/procurement/penalties/:id/confirm        // 确认罚单
 
 // 退货单
-GET  /api/v1/procurement/return-orders                // 退货单列表
-POST /api/v1/procurement/return-orders                // 创建退货单
-PUT  /api/v1/procurement/return-orders/:id/confirm    // 确认退货
+GET  /api/procurement/return-orders                // 退货单列表
+POST /api/procurement/return-orders                // 创建退货单
+PUT  /api/procurement/return-orders/:id/confirm    // 确认退货
 ```
 
 ---

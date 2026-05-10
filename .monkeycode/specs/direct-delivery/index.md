@@ -232,28 +232,28 @@ interface DeliveryLeave {
 ## 第四部分：API 接口设计
 
 ```typescript
-// 基础路径：/api/v1/delivery
+// 基础路径：/api/delivery
 
 // 线路
-GET  /api/v1/delivery/routes                          // 线路列表
-GET  /api/v1/delivery/routes/:id                      // 线路详情
-POST /api/v1/delivery/routes/:id/claim                // 领取线路
+GET  /api/delivery/routes                          // 线路列表
+GET  /api/delivery/routes/:id                      // 线路详情
+POST /api/delivery/routes/:id/claim                // 领取线路
 
 // 配送
-POST /api/v1/delivery/deliveries/sort                 // 分拣确认
-POST /api/v1/delivery/deliveries/checkout             // 出库核对
-POST /api/v1/delivery/deliveries/load                 // 装车确认
-POST /api/v1/delivery/deliveries/depart               // 发车
-POST /api/v1/delivery/deliveries/complete             // 配送完成
-POST /api/v1/delivery/deliveries/return               // 退货交接
-POST /api/v1/delivery/deliveries/finish               // 收车
+POST /api/delivery/deliveries/sort                 // 分拣确认
+POST /api/delivery/deliveries/checkout             // 出库核对
+POST /api/delivery/deliveries/load                 // 装车确认
+POST /api/delivery/deliveries/depart               // 发车
+POST /api/delivery/deliveries/complete             // 配送完成
+POST /api/delivery/deliveries/return               // 退货交接
+POST /api/delivery/deliveries/finish               // 收车
 
 // 记录
-GET  /api/v1/delivery/records                         // 配送记录
+GET  /api/delivery/records                         // 配送记录
 
 // 行政
-GET  /api/v1/delivery/schedules                      // 排班表
-POST /api/v1/delivery/leaves                         // 请假申请
+GET  /api/delivery/schedules                      // 排班表
+POST /api/delivery/leaves                         // 请假申请
 ```
 
 ---

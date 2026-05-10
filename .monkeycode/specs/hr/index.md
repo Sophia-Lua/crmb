@@ -379,46 +379,46 @@ interface PerformanceRecord {
 ## 第四部分：API 接口设计
 
 ```typescript
-// 基础路径：/api/v1/hr
+// 基础路径：/api/hr
 
 // 员工管理
-GET  /api/v1/hr/employees                             // 员工列表
-POST /api/v1/hr/employees                             // 创建员工
-PUT  /api/v1/hr/employees/:id                         // 编辑员工
+GET  /api/hr/employees                             // 员工列表
+POST /api/hr/employees                             // 创建员工
+PUT  /api/hr/employees/:id                         // 编辑员工
 
 // 账号管理
-GET  /api/v1/hr/accounts                              // 账号列表
-POST /api/v1/hr/accounts                              // 创建账号
-PUT  /api/v1/hr/accounts/:id/status                   // 禁用/启用
+GET  /api/hr/accounts                              // 账号列表
+POST /api/hr/accounts                              // 创建账号
+PUT  /api/hr/accounts/:id/status                   // 禁用/启用
 
 // 角色管理
-GET  /api/v1/hr/roles                                 // 角色列表
-POST /api/v1/hr/roles                                 // 创建角色
-PUT  /api/v1/hr/roles/:id/permissions                 // 配置权限
+GET  /api/hr/roles                                 // 角色列表
+POST /api/hr/roles                                 // 创建角色
+PUT  /api/hr/roles/:id/permissions                 // 配置权限
 
 // 报销
-GET  /api/v1/hr/reimbursements                        // 报销列表
-POST /api/v1/hr/reimbursements                        // 提交报销
-PUT  /api/v1/hr/reimbursements/:id/approve            // 审批报销
+GET  /api/hr/reimbursements                        // 报销列表
+POST /api/hr/reimbursements                        // 提交报销
+PUT  /api/hr/reimbursements/:id/approve            // 审批报销
 
 // 排班打卡
-GET  /api/v1/hr/schedules                             // 排班列表
-POST /api/v1/hr/schedules                             // 创建排班
-GET  /api/v1/hr/attendances                           // 打卡记录
-POST /api/v1/hr/attendances/clock                     // 打卡
+GET  /api/hr/schedules                             // 排班列表
+POST /api/hr/schedules                             // 创建排班
+GET  /api/hr/attendances                           // 打卡记录
+POST /api/hr/attendances/clock                     // 打卡
 
 // 请假
-GET  /api/v1/hr/leaves                                // 请假列表
-POST /api/v1/hr/leaves                                // 请假申请
-PUT  /api/v1/hr/leaves/:id/approve                    // 审批请假
+GET  /api/hr/leaves                                // 请假列表
+POST /api/hr/leaves                                // 请假申请
+PUT  /api/hr/leaves/:id/approve                    // 审批请假
 
 // 人员地图
-GET  /api/v1/hr/staff-map                             // 人员位置
-GET  /api/v1/hr/staff-tracks/:id                      // 人员轨迹
+GET  /api/hr/staff-map                             // 人员位置
+GET  /api/hr/staff-tracks/:id                      // 人员轨迹
 
 // 绩效指标
-GET  /api/v1/hr/performance-indicators                // 指标列表
-POST /api/v1/hr/performance-indicators                // 创建指标
+GET  /api/hr/performance-indicators                // 指标列表
+POST /api/hr/performance-indicators                // 创建指标
 ```
 
 ---

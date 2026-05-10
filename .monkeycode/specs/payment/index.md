@@ -132,18 +132,18 @@ interface Collection {
 ## 第四部分：API 接口设计
 
 ```typescript
-// 基础路径：/api/v1/payment
+// 基础路径：/api/payment
 
 // 商家
-GET  /api/v1/payment/merchants                        // 商家列表
-POST /api/v1/payment/merchants                        // 创建商家
-PUT  /api/v1/payment/merchants/:id                    // 编辑商家
-DELETE /api/v1/payment/merchants/:id                  // 删除商家
+GET  /api/payment/merchants                        // 商家列表
+POST /api/payment/merchants                        // 创建商家
+PUT  /api/payment/merchants/:id                    // 编辑商家
+DELETE /api/payment/merchants/:id                  // 删除商家
 
 // 收款
-GET  /api/v1/payment/collections                      // 收款列表
-GET  /api/v1/payment/collections/summary              // 收款汇总
-POST /api/v1/payment/collections/bind-product         // 绑定商品
+GET  /api/payment/collections                      // 收款列表
+GET  /api/payment/collections/summary              // 收款汇总
+POST /api/payment/collections/bind-product         // 绑定商品
 ```
 
 ---

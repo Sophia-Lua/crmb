@@ -171,25 +171,25 @@ interface SupplierReturnItem {
 ## 第四部分：API 接口设计
 
 ```typescript
-// 基础路径：/api/v1/supplier
+// 基础路径：/api/supplier
 
 // 订单
-GET  /api/v1/supplier/orders                          // 订单列表
-GET  /api/v1/supplier/orders/:id                      // 订单详情
-PUT  /api/v1/supplier/orders/:id/ship-qty             // 确认发货数
-PUT  /api/v1/supplier/orders/:id/ship                 // 发货
+GET  /api/supplier/orders                          // 订单列表
+GET  /api/supplier/orders/:id                      // 订单详情
+PUT  /api/supplier/orders/:id/ship-qty             // 确认发货数
+PUT  /api/supplier/orders/:id/ship                 // 发货
 
 // 收款
-GET  /api/v1/supplier/payments                        // 收款列表
+GET  /api/supplier/payments                        // 收款列表
 
 // 售后
-GET  /api/v1/supplier/penalties                       // 罚单列表
-GET  /api/v1/supplier/penalties/:id                   // 罚单详情
-PUT  /api/v1/supplier/penalties/:id/confirm           // 确认罚单
+GET  /api/supplier/penalties                       // 罚单列表
+GET  /api/supplier/penalties/:id                   // 罚单详情
+PUT  /api/supplier/penalties/:id/confirm           // 确认罚单
 
-GET  /api/v1/supplier/returns                         // 退货单列表
-GET  /api/v1/supplier/returns/:id                     // 退货详情
-PUT  /api/v1/supplier/returns/:id/confirm             // 确认退货
+GET  /api/supplier/returns                         // 退货单列表
+GET  /api/supplier/returns/:id                     // 退货详情
+PUT  /api/supplier/returns/:id/confirm             // 确认退货
 ```
 
 ---

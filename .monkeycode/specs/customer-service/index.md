@@ -365,41 +365,41 @@ interface Invoice {
 ## 第四部分：API 接口设计
 
 ```typescript
-// 基础路径：/api/v1/customer-service
+// 基础路径：/api/customer-service
 
 // 订单管理
-GET  /api/v1/customer-service/orders              // 订单列表
-GET  /api/v1/customer-service/orders/:id          // 订单详情
-PUT  /api/v1/customer-service/orders/:id/confirm  // 确认订单
-PUT  /api/v1/customer-service/orders/:id/cancel   // 取消订单
-POST /api/v1/customer-service/orders/:id/remark   // 添加备注
+GET  /api/customer-service/orders              // 订单列表
+GET  /api/customer-service/orders/:id          // 订单详情
+PUT  /api/customer-service/orders/:id/confirm  // 确认订单
+PUT  /api/customer-service/orders/:id/cancel   // 取消订单
+POST /api/customer-service/orders/:id/remark   // 添加备注
 
 // 售后管理
-GET  /api/v1/customer-service/after-sales         // 售后列表
-GET  /api/v1/customer-service/after-sales/:id     // 售后详情
-PUT  /api/v1/customer-service/after-sales/:id/approve   // 审核售后
-PUT  /api/v1/customer-service/after-sales/:id/receive  // 确认收货
-PUT  /api/v1/customer-service/after-sales/:id/refund   // 处理退款
+GET  /api/customer-service/after-sales         // 售后列表
+GET  /api/customer-service/after-sales/:id     // 售后详情
+PUT  /api/customer-service/after-sales/:id/approve   // 审核售后
+PUT  /api/customer-service/after-sales/:id/receive  // 确认收货
+PUT  /api/customer-service/after-sales/:id/refund   // 处理退款
 
 // 客诉管理
-GET  /api/v1/customer-service/complaints          // 客诉列表
-GET  /api/v1/customer-service/complaints/:id      // 客诉详情
-PUT  /api/v1/customer-service/complaints/:id/accept    // 受理客诉
-PUT  /api/v1/customer-service/complaints/:id/process   // 处理客诉
-PUT  /api/v1/customer-service/complaints/:id/close     // 关闭客诉
+GET  /api/customer-service/complaints          // 客诉列表
+GET  /api/customer-service/complaints/:id      // 客诉详情
+PUT  /api/customer-service/complaints/:id/accept    // 受理客诉
+PUT  /api/customer-service/complaints/:id/process   // 处理客诉
+PUT  /api/customer-service/complaints/:id/close     // 关闭客诉
 
 // 客户满意度
-GET  /api/v1/customer-service/reviews             // 评价列表
-POST /api/v1/customer-service/reviews/:id/reply   // 回复评价
-GET  /api/v1/customer-service/feedbacks           // 反馈列表
-PUT  /api/v1/customer-service/feedbacks/:id/process    // 处理反馈
+GET  /api/customer-service/reviews             // 评价列表
+POST /api/customer-service/reviews/:id/reply   // 回复评价
+GET  /api/customer-service/feedbacks           // 反馈列表
+PUT  /api/customer-service/feedbacks/:id/process    // 处理反馈
 
 // 发票管理
-GET  /api/v1/customer-service/invoices            // 发票列表
-GET  /api/v1/customer-service/invoices/:id        // 发票详情
-PUT  /api/v1/customer-service/invoices/:id/approve     // 审核发票
-PUT  /api/v1/customer-service/invoices/:id/issue       // 开具发票
-PUT  /api/v1/customer-service/invoices/:id/void        // 作废发票
+GET  /api/customer-service/invoices            // 发票列表
+GET  /api/customer-service/invoices/:id        // 发票详情
+PUT  /api/customer-service/invoices/:id/approve     // 审核发票
+PUT  /api/customer-service/invoices/:id/issue       // 开具发票
+PUT  /api/customer-service/invoices/:id/void        // 作废发票
 ```
 
 ---

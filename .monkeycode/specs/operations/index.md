@@ -305,35 +305,35 @@ interface Merchant {
 ## 第四部分：API 接口设计
 
 ```typescript
-// 基础路径：/api/v1/operations
+// 基础路径：/api/operations
 
 // 商品管理
-GET  /api/v1/operations/products                    // 商品列表
-GET  /api/v1/operations/products/:id                // 商品详情
-POST /api/v1/operations/products                    // 创建商品
-PUT  /api/v1/operations/products/:id                // 编辑商品
-PUT  /api/v1/operations/products/:id/status         // 上下架
+GET  /api/operations/products                    // 商品列表
+GET  /api/operations/products/:id                // 商品详情
+POST /api/operations/products                    // 创建商品
+PUT  /api/operations/products/:id                // 编辑商品
+PUT  /api/operations/products/:id/status         // 上下架
 
 // 分类管理
-GET  /api/v1/operations/categories                  // 分类列表
-POST /api/v1/operations/categories                  // 创建分类
-PUT  /api/v1/operations/categories/:id              // 编辑分类
+GET  /api/operations/categories                  // 分类列表
+POST /api/operations/categories                  // 创建分类
+PUT  /api/operations/categories/:id              // 编辑分类
 
 // 营销活动
-GET  /api/v1/operations/campaigns                   // 活动列表
-POST /api/v1/operations/campaigns                   // 创建活动
-PUT  /api/v1/operations/campaigns/:id                // 编辑活动
+GET  /api/operations/campaigns                   // 活动列表
+POST /api/operations/campaigns                   // 创建活动
+PUT  /api/operations/campaigns/:id                // 编辑活动
 
 // 优惠券
-GET  /api/v1/operations/coupons                     // 优惠券列表
-POST /api/v1/operations/coupons                     // 创建优惠券
-PUT  /api/v1/operations/coupons/:id                  // 编辑优惠券
+GET  /api/operations/coupons                     // 优惠券列表
+POST /api/operations/coupons                     // 创建优惠券
+PUT  /api/operations/coupons/:id                  // 编辑优惠券
 
 // 商家管理
-GET  /api/v1/operations/merchants                   // 商家列表
-POST /api/v1/operations/merchants/:id/audit         // 商家审核
-GET  /api/v1/operations/merchants/:id/products      // 商家商品
-PUT  /api/v1/operations/merchants/:id/status        // 商家状态
+GET  /api/operations/merchants                   // 商家列表
+POST /api/operations/merchants/:id/audit         // 商家审核
+GET  /api/operations/merchants/:id/products      // 商家商品
+PUT  /api/operations/merchants/:id/status        // 商家状态
 ```
 
 ---

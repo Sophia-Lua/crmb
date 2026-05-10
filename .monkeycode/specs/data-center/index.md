@@ -304,36 +304,36 @@ interface ProductCurrentCost {
 ## 第四部分：API 接口设计
 
 ```typescript
-// 基础路径：/api/v1/data-center
+// 基础路径：/api/data-center
 
 // 营业额
-GET  /api/v1/data-center/revenue                      // 营业额数据
-GET  /api/v1/data-center/revenue/trend                // 营业额趋势
-GET  /api/v1/data-center/revenue/export               // 导出 Excel
+GET  /api/data-center/revenue                      // 营业额数据
+GET  /api/data-center/revenue/trend                // 营业额趋势
+GET  /api/data-center/revenue/export               // 导出 Excel
 
 // 商品销量
-GET  /api/v1/data-center/product-sales                // 销量数据
-GET  /api/v1/data-center/product-sales/ranking        // 销量排行
+GET  /api/data-center/product-sales                // 销量数据
+GET  /api/data-center/product-sales/ranking        // 销量排行
 
 // 区域业绩
-GET  /api/v1/data-center/region-performance           // 区域业绩
-GET  /api/v1/data-center/region-performance/ranking   // 区域排名
+GET  /api/data-center/region-performance           // 区域业绩
+GET  /api/data-center/region-performance/ranking   // 区域排名
 
 // 人员业绩
-GET  /api/v1/data-center/staff-performance            // 人员业绩
-GET  /api/v1/data-center/staff-performance/ranking    // 业绩排名
+GET  /api/data-center/staff-performance            // 人员业绩
+GET  /api/data-center/staff-performance/ranking    // 业绩排名
 
 // 人员成本
-GET  /api/v1/data-center/staff-cost                   // 人员成本
-GET  /api/v1/data-center/staff-cost/analysis          // 成本分析
+GET  /api/data-center/staff-cost                   // 人员成本
+GET  /api/data-center/staff-cost/analysis          // 成本分析
 
 // 商品历史采购价
-GET  /api/v1/data-center/product-history-price        // 历史价格
-GET  /api/v1/data-center/product-history-price/trend  // 价格趋势
+GET  /api/data-center/product-history-price        // 历史价格
+GET  /api/data-center/product-history-price/trend  // 价格趋势
 
 // 商品当下成本
-GET  /api/v1/data-center/product-current-cost         // 当前成本
-GET  /api/v1/data-center/product-current-cost/margin  // 毛利分析
+GET  /api/data-center/product-current-cost         // 当前成本
+GET  /api/data-center/product-current-cost/margin  // 毛利分析
 ```
 
 ---

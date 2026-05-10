@@ -311,100 +311,100 @@ interface Store {
 ### 3.1 拜访记录 API
 
 ```typescript
-// 基础路径：/api/v1/sales/visits
+// 基础路径：/api/sales/visits
 
 // 获取拜访列表
-GET /api/v1/sales/visits
+GET /api/sales/visits
   params: { page, pageSize, status, visitType, visitMethod, customerName, startDate, endDate }
 
 // 获取拜访详情
-GET /api/v1/sales/visits/:id
+GET /api/sales/visits/:id
 
 // 创建拜访记录
-POST /api/v1/sales/visits
+POST /api/sales/visits
   body: { customerId, visitType, visitMethod, planDate, subject, content, ... }
 
 // 更新拜访记录
-PUT /api/v1/sales/visits/:id
+PUT /api/sales/visits/:id
   body: { ...visit fields... }
 
 // 删除拜访记录
-DELETE /api/v1/sales/visits/:id
+DELETE /api/sales/visits/:id
 
 // 获取统计数据
-GET /api/v1/sales/visits/statistics
+GET /api/sales/visits/statistics
 ```
 
 ### 3.2 店铺管理 API
 
 ```typescript
-// 基础路径：/api/v1/sales/stores
+// 基础路径：/api/sales/stores
 
 // 获取待领取店铺列表
-GET /api/v1/sales/stores/unclaimed
+GET /api/sales/stores/unclaimed
 
 // 获取待审核店铺列表
-GET /api/v1/sales/stores/review
+GET /api/sales/stores/review
 
 // 获取店铺详情
-GET /api/v1/sales/stores/:id
+GET /api/sales/stores/:id
 
 // 领取店铺
-POST /api/v1/sales/stores/:id/claim
+POST /api/sales/stores/:id/claim
 
 // 审核店铺
-POST /api/v1/sales/stores/:id/review
+POST /api/sales/stores/:id/review
   body: { status: 'approved' | 'rejected', rejectReason?: string }
 
 // 分配店铺
-POST /api/v1/sales/stores/:id/assign
+POST /api/sales/stores/:id/assign
   body: { assignedTo: string }
 
 // 获取统计数据
-GET /api/v1/sales/stores/statistics
+GET /api/sales/stores/statistics
 ```
 
 ### 3.3 客户管理 API
 
 ```typescript
-// 基础路径：/api/v1/sales/customers
+// 基础路径：/api/sales/customers
 
 // 获取公海客户列表
-GET /api/v1/sales/customers/public
+GET /api/sales/customers/public
 
 // 获取私海客户列表
-GET /api/v1/sales/customers/private
+GET /api/sales/customers/private
 
 // 获取客户详情
-GET /api/v1/sales/customers/:id
+GET /api/sales/customers/:id
 
 // 领取客户
-POST /api/v1/sales/customers/:id/claim
+POST /api/sales/customers/:id/claim
 
 // 归还公海
-POST /api/v1/sales/customers/:id/return
+POST /api/sales/customers/:id/return
 
 // 转移客户
-POST /api/v1/sales/customers/:id/transfer
+POST /api/sales/customers/:id/transfer
 
 // 客户搜索
-GET /api/v1/sales/customers/search
+GET /api/sales/customers/search
 ```
 
 ### 3.4 销售地图 API
 
 ```typescript
-// 基础路径：/api/v1/sales/map
+// 基础路径：/api/sales/map
 
 // 获取客户分布数据
-GET /api/v1/sales/map/customers
+GET /api/sales/map/customers
   params: { type, bounds }
 
 // 获取未注册店铺数据
-GET /api/v1/sales/map/unregistered
+GET /api/sales/map/unregistered
 
 // 获取标记详情
-GET /api/v1/sales/markers/:id
+GET /api/sales/markers/:id
 ```
 
 ---
@@ -716,83 +716,83 @@ import request from '@/utils/request';
 
 // 拜访记录
 export function getVisits(params) {
-  return request({ url: '/api/v1/sales/visits', method: 'GET', params });
+  return request({ url: '/api/sales/visits', method: 'GET', params });
 }
 
 export function getVisit(id) {
-  return request({ url: `/api/v1/sales/visits/${id}`, method: 'GET' });
+  return request({ url: `/api/sales/visits/${id}`, method: 'GET' });
 }
 
 export function createVisit(data) {
-  return request({ url: '/api/v1/sales/visits', method: 'POST', data });
+  return request({ url: '/api/sales/visits', method: 'POST', data });
 }
 
 export function updateVisit(id, data) {
-  return request({ url: `/api/v1/sales/visits/${id}`, method: 'PUT', data });
+  return request({ url: `/api/sales/visits/${id}`, method: 'PUT', data });
 }
 
 export function deleteVisit(id) {
-  return request({ url: `/api/v1/sales/visits/${id}`, method: 'DELETE' });
+  return request({ url: `/api/sales/visits/${id}`, method: 'DELETE' });
 }
 
 // 店铺管理
 export function getUnclaimedStores(params) {
-  return request({ url: '/api/v1/sales/stores/unclaimed', method: 'GET', params });
+  return request({ url: '/api/sales/stores/unclaimed', method: 'GET', params });
 }
 
 export function getReviewStores(params) {
-  return request({ url: '/api/v1/sales/stores/review', method: 'GET', params });
+  return request({ url: '/api/sales/stores/review', method: 'GET', params });
 }
 
 export function getStore(id) {
-  return request({ url: `/api/v1/sales/stores/${id}`, method: 'GET' });
+  return request({ url: `/api/sales/stores/${id}`, method: 'GET' });
 }
 
 export function claimStore(id) {
-  return request({ url: `/api/v1/sales/stores/${id}/claim`, method: 'POST' });
+  return request({ url: `/api/sales/stores/${id}/claim`, method: 'POST' });
 }
 
 export function reviewStore(id, data) {
-  return request({ url: `/api/v1/sales/stores/${id}/review`, method: 'POST', data });
+  return request({ url: `/api/sales/stores/${id}/review`, method: 'POST', data });
 }
 
 export function assignStore(id, data) {
-  return request({ url: `/api/v1/sales/stores/${id}/assign`, method: 'POST', data });
+  return request({ url: `/api/sales/stores/${id}/assign`, method: 'POST', data });
 }
 
 // 客户管理
 export function getPublicCustomers(params) {
-  return request({ url: '/api/v1/sales/customers/public', method: 'GET', params });
+  return request({ url: '/api/sales/customers/public', method: 'GET', params });
 }
 
 export function getPrivateCustomers(params) {
-  return request({ url: '/api/v1/sales/customers/private', method: 'GET', params });
+  return request({ url: '/api/sales/customers/private', method: 'GET', params });
 }
 
 export function getCustomer(id) {
-  return request({ url: `/api/v1/sales/customers/${id}`, method: 'GET' });
+  return request({ url: `/api/sales/customers/${id}`, method: 'GET' });
 }
 
 export function claimCustomer(id) {
-  return request({ url: `/api/v1/sales/customers/${id}/claim`, method: 'POST' });
+  return request({ url: `/api/sales/customers/${id}/claim`, method: 'POST' });
 }
 
 // 销售地图
 export function getMapMarkers(params) {
-  return request({ url: '/api/v1/sales/map/customers', method: 'GET', params });
+  return request({ url: '/api/sales/map/customers', method: 'GET', params });
 }
 
 export function getUnregisteredStores(params) {
-  return request({ url: '/api/v1/sales/map/unregistered', method: 'GET', params });
+  return request({ url: '/api/sales/map/unregistered', method: 'GET', params });
 }
 
 // 统计数据
 export function getVisitStats(params) {
-  return request({ url: '/api/v1/sales/visits/statistics', method: 'GET', params });
+  return request({ url: '/api/sales/visits/statistics', method: 'GET', params });
 }
 
 export function getStoreStats(params) {
-  return request({ url: '/api/v1/sales/stores/statistics', method: 'GET', params });
+  return request({ url: '/api/sales/stores/statistics', method: 'GET', params });
 }
 ```
 
@@ -807,7 +807,7 @@ export function getStoreStats(params) {
 import Mock from 'mockjs';
 
 // 拜访记录 Mock
-Mock.mock(/\/api\/v1\/sales\/visits(\?.*)?$/, 'get', (options) => {
+Mock.mock(/\/api\/sales\/visits(\?.*)?$/, 'get', (options) => {
   const params = new URLSearchParams(options.url.split('?')[1]);
   const page = parseInt(params.get('page')) || 1;
   const pageSize = parseInt(params.get('pageSize')) || 20;
@@ -841,7 +841,7 @@ Mock.mock(/\/api\/v1\/sales\/visits(\?.*)?$/, 'get', (options) => {
 });
 
 // 店铺 Mock
-Mock.mock(/\/api\/v1\/sales\/stores\/unclaimed(\?.*)?$/, 'get', () => {
+Mock.mock(/\/api\/sales\/stores\/unclaimed(\?.*)?$/, 'get', () => {
   const stores = Mock.mock({
     'list|50': [{
       'id|+1': 1,

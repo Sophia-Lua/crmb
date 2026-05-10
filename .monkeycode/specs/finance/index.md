@@ -159,22 +159,22 @@ interface Payment {
 ## 第四部分：API 接口设计
 
 ```typescript
-// 基础路径：/api/v1/finance
+// 基础路径：/api/finance
 
 // 店铺充值
-GET  /api/v1/finance/recharges                        // 充值列表
-PUT  /api/v1/finance/recharges/:id/confirm            // 确认充值
+GET  /api/finance/recharges                        // 充值列表
+PUT  /api/finance/recharges/:id/confirm            // 确认充值
 
 // 发票管理
-GET  /api/v1/finance/invoices                         // 发票列表
-GET  /api/v1/finance/invoices/:id                     // 发票详情
-PUT  /api/v1/finance/invoices/:id/confirm             // 确认发票
+GET  /api/finance/invoices                         // 发票列表
+GET  /api/finance/invoices/:id                     // 发票详情
+PUT  /api/finance/invoices/:id/confirm             // 确认发票
 
 // 财务付款
-GET  /api/v1/finance/payments                         // 付款列表
-GET  /api/v1/finance/payments/:id                     // 付款详情
-PUT  /api/v1/finance/payments/:id/approve             // 审批付款
-PUT  /api/v1/finance/payments/:id/pay                 // 确认付款
+GET  /api/finance/payments                         // 付款列表
+GET  /api/finance/payments/:id                     // 付款详情
+PUT  /api/finance/payments/:id/approve             // 审批付款
+PUT  /api/finance/payments/:id/pay                 // 确认付款
 ```
 
 ---

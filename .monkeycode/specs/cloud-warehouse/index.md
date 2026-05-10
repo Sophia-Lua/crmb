@@ -341,36 +341,36 @@ interface VehicleUsage {
 ## 第四部分：API 接口设计
 
 ```typescript
-// 基础路径：/api/v1/warehouse
+// 基础路径：/api/warehouse
 
 // 出库
-GET  /api/v1/warehouse/out-orders                     // 出库单列表
-POST /api/v1/warehouse/out-orders                     // 创建出库单
-PUT  /api/v1/warehouse/out-orders/:id/confirm         // 确认出库
+GET  /api/warehouse/out-orders                     // 出库单列表
+POST /api/warehouse/out-orders                     // 创建出库单
+PUT  /api/warehouse/out-orders/:id/confirm         // 确认出库
 
 // 入库
-GET  /api/v1/warehouse/in-orders                      // 入库单列表
-POST /api/v1/warehouse/in-orders                      // 创建入库单
-PUT  /api/v1/warehouse/in-orders/:id/confirm          // 确认入库
+GET  /api/warehouse/in-orders                      // 入库单列表
+POST /api/warehouse/in-orders                      // 创建入库单
+PUT  /api/warehouse/in-orders/:id/confirm          // 确认入库
 
 // 库存
-GET  /api/v1/warehouse/inventory                      // 库存列表
-GET  /api/v1/warehouse/inventory/:sku                 // 商品库存
-GET  /api/v1/warehouse/inventory/warning              // 库存预警
+GET  /api/warehouse/inventory                      // 库存列表
+GET  /api/warehouse/inventory/:sku                 // 商品库存
+GET  /api/warehouse/inventory/warning              // 库存预警
 
 // 盘点
-GET  /api/v1/warehouse/stocktake                      // 盘点单列表
-POST /api/v1/warehouse/stocktake                      // 创建盘点单
-PUT  /api/v1/warehouse/stocktake/:id/confirm          // 确认盘点
+GET  /api/warehouse/stocktake                      // 盘点单列表
+POST /api/warehouse/stocktake                      // 创建盘点单
+PUT  /api/warehouse/stocktake/:id/confirm          // 确认盘点
 
 // 库位
-GET  /api/v1/warehouse/locations                      // 库位列表
-POST /api/v1/warehouse/locations                      // 创建库位
+GET  /api/warehouse/locations                      // 库位列表
+POST /api/warehouse/locations                      // 创建库位
 
 // 行政
-GET  /api/v1/warehouse/unload-tasks                   // 卸货任务
-GET  /api/v1/warehouse/schedules                      // 排班表
-GET  /api/v1/warehouse/vehicles                       // 车辆列表
+GET  /api/warehouse/unload-tasks                   // 卸货任务
+GET  /api/warehouse/schedules                      // 排班表
+GET  /api/warehouse/vehicles                       // 车辆列表
 ```
 
 ---
