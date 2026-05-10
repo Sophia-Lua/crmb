@@ -1,8 +1,8 @@
 # 支付模块 - 需求与设计文档
 
 **模块名称**: payment  
-**更新日期**: 2026-05-09  
-**版本**: v1.0
+**更新日期**: 2026-05-10  
+**版本**: v1.1
 
 ---
 
@@ -374,6 +374,152 @@ export function bindProduct(collectionId, data) {
 }
 ```
 
+### 5.5 后端Go实现
+
+#### 目录结构
+```
+internal/
+├── handler/
+│   └── payment/
+│       ├── merchant_handler.go
+│       └── collection_handler.go
+├── service/
+│   └── payment/
+│       ├── merchant_service.go
+│       └── collection_service.go
+├── model/
+│   └── payment/
+│       ├── merchant.go
+│       └── collection.go
+└── dto/
+    └── payment/
+        ├── merchant_dto.go
+        └── collection_dto.go
+```
+
+#### 核心Handler示例
+```go
+// internal/handler/payment/merchant_handler.go
+package payment
+
+import (
+    "net/http"
+    "github.com/gin-gonic/gin"
+    "your-project/internal/service/payment"
+    "your-project/internal/dto/payment"
+)
+
+type MerchantHandler struct {
+    merchantService *payment.MerchantService
+}
+
+func NewMerchantHandler(merchantService *payment.MerchantService) *MerchantHandler {
+    return &MerchantHandler{
+        merchantService: merchantService,
+    }
+}
+
+// GetMerchants 获取商家列表
+func (h *MerchantHandler) GetMerchants(c *gin.Context) {
+    var req payment.GetMerchantsRequest
+    if err := c.ShouldBindQuery(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    
+    merchants, total, err := h.merchantService.GetMerchants(c.Request.Context(), &req)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, gin.H{
+        "code": 200,
+        "message": "success",
+        "data": gin.H{
+            "list": merchants,
+            "total": total,
+            "page": req.Page,
+            "pageSize": req.PageSize,
+        },
+    })
+}
+
+// CreateMerchant 创建商家
+func (h *MerchantHandler) CreateMerchant(c *gin.Context) {
+    var req payment.CreateMerchantRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    
+    merchant, err := h.merchantService.CreateMerchant(c.Request.Context(), &req)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, gin.H{
+        "code": 200,
+        "message": "success",
+        "data": merchant,
+    })
+}
+```
+
+#### Service层示例
+```go
+// internal/service/payment/merchant_service.go
+package payment
+
+import (
+    "context"
+    "your-project/internal/model/payment"
+    "your-project/internal/repository"
+)
+
+type MerchantService struct {
+    merchantRepo repository.MerchantRepository
+}
+
+func NewMerchantService(merchantRepo repository.MerchantRepository) *MerchantService {
+    return &MerchantService{
+        merchantRepo: merchantRepo,
+    }
+}
+
+func (s *MerchantService) GetMerchants(ctx context.Context, req *GetMerchantsRequest) ([]*payment.Merchant, int64, error) {
+    merchants, total, err := s.merchantRepo.FindByConditions(ctx, req.ToQueryConditions())
+    if err != nil {
+        return nil, 0, err
+    }
+    
+    return merchants, total, nil
+}
+
+func (s *MerchantService) CreateMerchant(ctx context.Context, req *CreateMerchantRequest) (*payment.Merchant, error) {
+    if err := req.Validate(); err != nil {
+        return nil, err
+    }
+    
+    merchant := &payment.Merchant{
+        MerchantNo:     req.MerchantNo,
+        Name:          req.Name,
+        ContactName:   req.ContactName,
+        ContactPhone:  req.ContactPhone,
+        SettlementType: req.SettlementType,
+        Status:        "active",
+    }
+    
+    err := s.merchantRepo.Create(ctx, merchant)
+    if err != nil {
+        return nil, err
+    }
+    
+    return merchant, nil
+}
+```
+
 ---
 
 ## 第六部分：Mock 数据方案
@@ -575,6 +721,14 @@ router.beforeEach((to, from, next) => {
 3. **性能优化**: 小程序包大小控制在2MB以内
 4. **用户体验**: 遵循微信小程序设计规范
 
+### 8.5 Go后端注意事项
+
+1. **Goroutines安全**: 避免数据竞争，使用sync.Mutex或channel
+2. **内存管理**: 注意slice和map的内存分配，避免内存泄漏
+3. **错误处理**: 统一错误处理机制，使用errors包
+4. **数据库连接**: 使用GORM连接池，避免连接泄露
+5. **日志记录**: 使用zap或logrus进行结构化日志记录
+
 ---
 
 ## 第九部分：开发计划
@@ -585,125 +739,6 @@ router.beforeEach((to, from, next) => {
 | 2 | 收款管理 | 2 天 |
 | 3 | 权限控制 | 1 天 |
 | 4 | 移动端适配 | 2 天 |
-| 5 | 联调测试 | 2 天 |
-| **总计** | | **10 天** |
-
----
-```
-
----
-
-## 第六部分：Mock 数据方案
-
-### 6.1 Mock 配置
-
-```javascript
-// src/mock/payment.js
-import Mock from 'mockjs';
-
-// 商家 Mock
-Mock.mock(/\/api\/payment\/merchants(\?.*)?$/, 'get', (options) => {
-  const params = new URLSearchParams(options.url.split('?')[1]);
-  const page = parseInt(params.get('page')) || 1;
-  const pageSize = parseInt(params.get('pageSize')) || 20;
-  
-  const merchants = Mock.mock({
-    'list|50': [{
-      'id|+1': 1,
-      'merchantNo': '@string("M", 8)',
-      'name': '@ctitle(4,8)商家',
-      'contactName': '@cname',
-      'contactPhone': /^1[3-9]\d{9}$/,
-      'settlementType|1': ['daily', 'weekly', 'monthly'],
-      'status|1': ['active', 'inactive'],
-      'totalCollections|1000-100000': 1,
-      'collectionCount|10-1000': 1,
-      'createdAt': '@datetime'
-    }]
-  });
-  
-  const start = (page - 1) * pageSize;
-  const end = start + pageSize;
-  
-  return {
-    code: 200,
-    message: 'success',
-    data: {
-      list: merchants.list.slice(start, end),
-      total: merchants.list.length,
-      page,
-      pageSize
-    }
-  };
-});
-
-// 收款记录 Mock
-Mock.mock(/\/api\/payment\/collections(\?.*)?$/, 'get', (options) => {
-  const params = new URLSearchParams(options.url.split('?')[1]);
-  const page = parseInt(params.get('page')) || 1;
-  const pageSize = parseInt(params.get('pageSize')) || 20;
-  
-  const collections = Mock.mock({
-    'list|100': [{
-      'id|+1': 1,
-      'collectionNo': '@string("C", 10)',
-      'merchantId|1-50': 1,
-      'merchantName': '@ctitle(4,8)商家',
-      'amount|100-10000': 1,
-      'payType|1': ['wechat', 'alipay', 'balance', 'cash'],
-      'productId|1-1000': 1,
-      'productName': '@ctitle(5,10)',
-      'category': '@ctitle(2,4)',
-      'status|1': ['success', 'refunded', 'cancelled'],
-      'createdAt': '@datetime'
-    }]
-  });
-  
-  const start = (page - 1) * pageSize;
-  const end = start + pageSize;
-  
-  return {
-    code: 200,
-    message: 'success',
-    data: {
-      list: collections.list.slice(start, end),
-      total: collections.list.length,
-      page,
-      pageSize
-    }
-  };
-});
-
-// 收款汇总 Mock
-Mock.mock(/\/api\/payment\/collections\/summary(\?.*)?$/, 'get', () => {
-  return {
-    code: 200,
-    message: 'success',
-    data: {
-      totalAmount: Mock.Random.float(10000, 1000000, 2),
-      totalCount: Mock.Random.integer(100, 10000),
-      todayAmount: Mock.Random.float(1000, 50000, 2),
-      todayCount: Mock.Random.integer(10, 500),
-      payTypeBreakdown: {
-        wechat: Mock.Random.float(30, 70, 2),
-        alipay: Mock.Random.float(20, 50, 2),
-        balance: Mock.Random.float(5, 20, 2),
-        cash: Mock.Random.float(1, 10, 2)
-      }
-    }
-  };
-});
-```
-
----
-
----
-
-## 第六部分：开发计划
-
-| 阶段 | 内容 | 工期 |
-|------|------|------|
-| 1 | 商家管理 | 3 天 |
-| 2 | 收款管理 | 2 天 |
-| 3 | 联调测试 | 2 天 |
-| **总计** | | **7 天** |
+| 5 | Go后端开发 | 4 天 |
+| 6 | 联调测试 | 2 天 |
+| **总计** | | **14 天** |

@@ -427,6 +427,262 @@ const chartOption = computed(() => ({
 </script>
 ```
 
+### 5.3 API 封装
+
+```javascript
+// src/api/dataCenter.js
+import request from '@/utils/request';
+
+// 营业额
+export function getRevenueData(params) {
+  return request({ url: '/api/data-center/revenue', method: 'GET', params });
+}
+
+export function getRevenueTrend(params) {
+  return request({ url: '/api/data-center/revenue/trend', method: 'GET', params });
+}
+
+export function exportRevenueData(params) {
+  return request({ url: '/api/data-center/revenue/export', method: 'GET', params, responseType: 'blob' });
+}
+
+// 商品销量
+export function getProductSales(params) {
+  return request({ url: '/api/data-center/product-sales', method: 'GET', params });
+}
+
+export function getProductSalesRanking(params) {
+  return request({ url: '/api/data-center/product-sales/ranking', method: 'GET', params });
+}
+
+// 区域业绩
+export function getRegionPerformance(params) {
+  return request({ url: '/api/data-center/region-performance', method: 'GET', params });
+}
+
+export function getRegionPerformanceRanking(params) {
+  return request({ url: '/api/data-center/region-performance/ranking', method: 'GET', params });
+}
+
+// 人员业绩
+export function getStaffPerformance(params) {
+  return request({ url: '/api/data-center/staff-performance', method: 'GET', params });
+}
+
+export function getStaffPerformanceRanking(params) {
+  return request({ url: '/api/data-center/staff-performance/ranking', method: 'GET', params });
+}
+
+// 人员成本
+export function getStaffCost(params) {
+  return request({ url: '/api/data-center/staff-cost', method: 'GET', params });
+}
+
+export function getStaffCostAnalysis(params) {
+  return request({ url: '/api/data-center/staff-cost/analysis', method: 'GET', params });
+}
+
+// 商品历史价格
+export function getProductHistoryPrice(params) {
+  return request({ url: '/api/data-center/product-history-price', method: 'GET', params });
+}
+
+export function getProductHistoryPriceTrend(params) {
+  return request({ url: '/api/data-center/product-history-price/trend', method: 'GET', params });
+}
+
+// 商品当前成本
+export function getProductCurrentCost(params) {
+  return request({ url: '/api/data-center/product-current-cost', method: 'GET', params });
+}
+
+export function getProductCurrentCostMargin(params) {
+  return request({ url: '/api/data-center/product-current-cost/margin', method: 'GET', params });
+}
+```
+
+### 5.4 后端Go实现
+
+#### 目录结构
+```
+internal/
+├── handler/
+│   └── datacenter/
+│       ├── revenue_handler.go
+│       ├── product_handler.go
+│       ├── region_handler.go
+│       ├── staff_handler.go
+│       └── price_handler.go
+├── service/
+│   └── datacenter/
+│       ├── revenue_service.go
+│       ├── product_service.go
+│       ├── region_service.go
+│       ├── staff_service.go
+│       └── price_service.go
+├── model/
+│   └── datacenter/
+│       ├── revenue.go
+│       ├── product.go
+│       ├── region.go
+│       ├── staff.go
+│       └── price.go
+└── dto/
+    └── datacenter/
+        ├── revenue_dto.go
+        ├── product_dto.go
+        ├── region_dto.go
+        ├── staff_dto.go
+        └── price_dto.go
+```
+
+#### 核心Handler示例
+```go
+// internal/handler/datacenter/revenue_handler.go
+package datacenter
+
+import (
+    "net/http"
+    "github.com/gin-gonic/gin"
+    "your-project/internal/service/datacenter"
+    "your-project/internal/dto/datacenter"
+)
+
+type RevenueHandler struct {
+    revenueService *datacenter.RevenueService
+}
+
+func NewRevenueHandler(revenueService *datacenter.RevenueService) *RevenueHandler {
+    return &RevenueHandler{
+        revenueService: revenueService,
+    }
+}
+
+// GetRevenueData 获取营业额数据
+func (h *RevenueHandler) GetRevenueData(c *gin.Context) {
+    var req datacenter.GetRevenueRequest
+    if err := c.ShouldBindQuery(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    
+    revenueData, err := h.revenueService.GetRevenueData(c.Request.Context(), &req)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, gin.H{
+        "code": 200,
+        "message": "success",
+        "data": revenueData,
+    })
+}
+
+// ExportRevenueData 导出营业额数据
+func (h *RevenueHandler) ExportRevenueData(c *gin.Context) {
+    var req datacenter.ExportRevenueRequest
+    if err := c.ShouldBindQuery(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    
+    fileData, filename, err := h.revenueService.ExportRevenueData(c.Request.Context(), &req)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    c.Header("Content-Disposition", "attachment; filename="+filename)
+    c.Data(http.StatusOK, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileData)
+}
+```
+
+#### Service层示例
+```go
+// internal/service/datacenter/revenue_service.go
+package datacenter
+
+import (
+    "context"
+    "your-project/internal/model/datacenter"
+    "your-project/internal/repository"
+    "your-project/pkg/excel"
+)
+
+type RevenueService struct {
+    revenueRepo repository.RevenueRepository
+}
+
+func NewRevenueService(revenueRepo repository.RevenueRepository) *RevenueService {
+    return &RevenueService{
+        revenueRepo: revenueRepo,
+    }
+}
+
+func (s *RevenueService) GetRevenueData(ctx context.Context, req *GetRevenueRequest) (*RevenueResponse, error) {
+    // 构建查询条件
+    conditions := req.ToQueryConditions()
+    
+    // 查询营业额数据
+    revenueList, err := s.revenueRepo.FindByConditions(ctx, conditions)
+    if err != nil {
+        return nil, err
+    }
+    
+    // 计算汇总数据
+    summary := s.calculateSummary(revenueList)
+    
+    return &RevenueResponse{
+        List:    revenueList,
+        Summary: summary,
+    }, nil
+}
+
+func (s *RevenueService) ExportRevenueData(ctx context.Context, req *ExportRevenueRequest) ([]byte, string, error) {
+    // 获取数据
+    revenueData, err := s.GetRevenueData(ctx, &GetRevenueRequest{
+        DateRange: req.DateRange,
+        City:      req.City,
+        Region:    req.Region,
+    })
+    if err != nil {
+        return nil, "", err
+    }
+    
+    // 生成Excel文件
+    filename := "revenue_report_" + time.Now().Format("20060102") + ".xlsx"
+    fileData, err := excel.GenerateRevenueReport(revenueData.List, revenueData.Summary)
+    if err != nil {
+        return nil, "", err
+    }
+    
+    return fileData, filename, nil
+}
+
+func (s *RevenueService) calculateSummary(revenueList []*datacenter.RevenueData) *RevenueSummary {
+    var totalRevenue float64
+    var totalOrders int64
+    var avgOrderAmount float64
+    
+    for _, revenue := range revenueList {
+        totalRevenue += revenue.TotalRevenue
+        totalOrders += int64(revenue.OrderCount)
+    }
+    
+    if totalOrders > 0 {
+        avgOrderAmount = totalRevenue / float64(totalOrders)
+    }
+    
+    return &RevenueSummary{
+        TotalRevenue:    totalRevenue,
+        TotalOrders:     totalOrders,
+        AvgOrderAmount:  avgOrderAmount,
+    }
+}
+```
+
 ---
 
 ## 第六部分：Mock 数据方案
@@ -608,5 +864,6 @@ router.beforeEach((to, from, next) => {
 | 4 | 商品价格相关 | 2 天 |
 | 5 | 权限控制 | 1 天 |
 | 6 | 性能优化 | 1 天 |
-| 7 | 联调测试 | 2 天 |
-| **总计** | | **14 天** |
+| 7 | Go后端开发 | 5 天 |
+| 8 | 联调测试 | 2 天 |
+| **总计** | | **19 天** |

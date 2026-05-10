@@ -409,6 +409,343 @@ src/
     └── warehouse.js
 ```
 
+### 5.2 API 封装
+
+```javascript
+// src/api/warehouse.js
+import request from '@/utils/request';
+
+// 出库管理
+export function getOutOrders(params) {
+  return request({ url: '/api/warehouse/out-orders', method: 'GET', params });
+}
+
+export function createOutOrder(data) {
+  return request({ url: '/api/warehouse/out-orders', method: 'POST', data });
+}
+
+export function confirmOutOrder(id, data) {
+  return request({ url: `/api/warehouse/out-orders/${id}/confirm`, method: 'PUT', data });
+}
+
+// 入库管理
+export function getInOrders(params) {
+  return request({ url: '/api/warehouse/in-orders', method: 'GET', params });
+}
+
+export function createInOrder(data) {
+  return request({ url: '/api/warehouse/in-orders', method: 'POST', data });
+}
+
+export function confirmInOrder(id, data) {
+  return request({ url: `/api/warehouse/in-orders/${id}/confirm`, method: 'PUT', data });
+}
+
+// 库存管理
+export function getInventory(params) {
+  return request({ url: '/api/warehouse/inventory', method: 'GET', params });
+}
+
+export function getInventoryBySku(sku) {
+  return request({ url: `/api/warehouse/inventory/${sku}`, method: 'GET' });
+}
+
+export function getInventoryWarning(params) {
+  return request({ url: '/api/warehouse/inventory/warning', method: 'GET', params });
+}
+
+// 盘点管理
+export function getStocktakeList(params) {
+  return request({ url: '/api/warehouse/stocktake', method: 'GET', params });
+}
+
+export function createStocktake(data) {
+  return request({ url: '/api/warehouse/stocktake', method: 'POST', data });
+}
+
+export function confirmStocktake(id, data) {
+  return request({ url: `/api/warehouse/stocktake/${id}/confirm`, method: 'PUT', data });
+}
+
+// 库位管理
+export function getLocations(params) {
+  return request({ url: '/api/warehouse/locations', method: 'GET', params });
+}
+
+export function createLocation(data) {
+  return request({ url: '/api/warehouse/locations', method: 'POST', data });
+}
+
+// 行政管理
+export function getUnloadTasks(params) {
+  return request({ url: '/api/warehouse/unload-tasks', method: 'GET', params });
+}
+
+export function getSchedules(params) {
+  return request({ url: '/api/warehouse/schedules', method: 'GET', params });
+}
+
+export function getVehicles(params) {
+  return request({ url: '/api/warehouse/vehicles', method: 'GET', params });
+}
+```
+
+### 5.3 后端Go实现
+
+#### 目录结构
+```
+internal/
+├── handler/
+│   └── warehouse/
+│       ├── out_order_handler.go
+│       ├── in_order_handler.go
+│       ├── inventory_handler.go
+│       ├── stocktake_handler.go
+│       ├── location_handler.go
+│       └── admin_handler.go
+├── service/
+│   └── warehouse/
+│       ├── out_order_service.go
+│       ├── in_order_service.go
+│       ├── inventory_service.go
+│       ├── stocktake_service.go
+│       ├── location_service.go
+│       └── admin_service.go
+├── model/
+│   └── warehouse/
+│       ├── out_order.go
+│       ├── in_order.go
+│       ├── inventory.go
+│       ├── stocktake.go
+│       ├── location.go
+│       └── admin.go
+└── dto/
+    └── warehouse/
+        ├── out_order_dto.go
+        ├── in_order_dto.go
+        ├── inventory_dto.go
+        ├── stocktake_dto.go
+        ├── location_dto.go
+        └── admin_dto.go
+```
+
+#### 核心Handler示例
+```go
+// internal/handler/warehouse/out_order_handler.go
+package warehouse
+
+import (
+    "net/http"
+    "github.com/gin-gonic/gin"
+    "your-project/internal/service/warehouse"
+    "your-project/internal/dto/warehouse"
+)
+
+type OutOrderHandler struct {
+    outOrderService *warehouse.OutOrderService
+}
+
+func NewOutOrderHandler(outOrderService *warehouse.OutOrderService) *OutOrderHandler {
+    return &OutOrderHandler{
+        outOrderService: outOrderService,
+    }
+}
+
+// GetOutOrders 获取出库单列表
+func (h *OutOrderHandler) GetOutOrders(c *gin.Context) {
+    var req warehouse.GetOutOrdersRequest
+    if err := c.ShouldBindQuery(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    
+    outOrders, total, err := h.outOrderService.GetOutOrders(c.Request.Context(), &req)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, gin.H{
+        "code": 200,
+        "message": "success",
+        "data": gin.H{
+            "list": outOrders,
+            "total": total,
+            "page": req.Page,
+            "pageSize": req.PageSize,
+        },
+    })
+}
+
+// CreateOutOrder 创建出库单
+func (h *OutOrderHandler) CreateOutOrder(c *gin.Context) {
+    var req warehouse.CreateOutOrderRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    
+    outOrder, err := h.outOrderService.CreateOutOrder(c.Request.Context(), &req)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, gin.H{
+        "code": 200,
+        "message": "success",
+        "data": outOrder,
+    })
+}
+
+// ConfirmOutOrder 确认出库
+func (h *OutOrderHandler) ConfirmOutOrder(c *gin.Context) {
+    id := c.Param("id")
+    var req warehouse.ConfirmOutOrderRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    
+    err := h.outOrderService.ConfirmOutOrder(c.Request.Context(), id, &req)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, gin.H{
+        "code": 200,
+        "message": "success",
+    })
+}
+```
+
+#### Service层示例
+```go
+// internal/service/warehouse/out_order_service.go
+package warehouse
+
+import (
+    "context"
+    "your-project/internal/model/warehouse"
+    "your-project/internal/repository"
+    "your-project/pkg/transaction"
+)
+
+type OutOrderService struct {
+    outOrderRepo repository.OutOrderRepository
+    txManager    transaction.Manager
+}
+
+func NewOutOrderService(outOrderRepo repository.OutOrderRepository, txManager transaction.Manager) *OutOrderService {
+    return &OutOrderService{
+        outOrderRepo: outOrderRepo,
+        txManager:    txManager,
+    }
+}
+
+func (s *OutOrderService) GetOutOrders(ctx context.Context, req *GetOutOrdersRequest) ([]*warehouse.OutOrder, int64, error) {
+    outOrders, total, err := s.outOrderRepo.FindByConditions(ctx, req.ToQueryConditions())
+    if err != nil {
+        return nil, 0, err
+    }
+    
+    return outOrders, total, nil
+}
+
+func (s *OutOrderService) CreateOutOrder(ctx context.Context, req *CreateOutOrderRequest) (*warehouse.OutOrder, error) {
+    if err := req.Validate(); err != nil {
+        return nil, err
+    }
+    
+    // 开启事务
+    txCtx, cancel := s.txManager.Begin(ctx)
+    defer cancel()
+    
+    outOrder := &warehouse.OutOrder{
+        OrderNo:     s.generateOrderNo(),
+        Type:        req.Type,
+        SourceID:    req.SourceID,
+        WarehouseID: req.WarehouseID,
+        Status:      "pending",
+        OperatorID:  req.OperatorID,
+        OperatorName: req.OperatorName,
+        Items:       req.Items,
+        Reason:      req.Reason,
+        Remark:      req.Remark,
+    }
+    
+    err := s.outOrderRepo.Create(txCtx, outOrder)
+    if err != nil {
+        s.txManager.Rollback(txCtx)
+        return nil, err
+    }
+    
+    // 提交事务
+    if err := s.txManager.Commit(txCtx); err != nil {
+        return nil, err
+    }
+    
+    return outOrder, nil
+}
+
+func (s *OutOrderService) ConfirmOutOrder(ctx context.Context, id string, req *ConfirmOutOrderRequest) error {
+    // 开启事务
+    txCtx, cancel := s.txManager.Begin(ctx)
+    defer cancel()
+    
+    // 获取出库单
+    outOrder, err := s.outOrderRepo.FindByID(txCtx, id)
+    if err != nil {
+        return err
+    }
+    
+    if outOrder.Status != "pending" && outOrder.Status != "picking" {
+        return errors.New("出库单状态不允许确认")
+    }
+    
+    // 更新出库单状态
+    outOrder.Status = "confirmed"
+    outOrder.ConfirmedAt = time.Now()
+    
+    err = s.outOrderRepo.Update(txCtx, outOrder)
+    if err != nil {
+        s.txManager.Rollback(txCtx)
+        return err
+    }
+    
+    // 扣减库存
+    err = s.deductInventory(txCtx, outOrder.Items)
+    if err != nil {
+        s.txManager.Rollback(txCtx)
+        return err
+    }
+    
+    // 提交事务
+    if err := s.txManager.Commit(txCtx); err != nil {
+        return err
+    }
+    
+    return nil
+}
+
+func (s *OutOrderService) deductInventory(ctx context.Context, items []warehouse.OutOrderItem) error {
+    // 扣减库存的业务逻辑
+    for _, item := range items {
+        // 更新库存数量
+        err := s.inventoryRepo.DeductQuantity(ctx, item.Sku, item.Quantity)
+        if err != nil {
+            return err
+        }
+    }
+    return nil
+}
+
+func (s *OutOrderService) generateOrderNo() string {
+    return "OUT" + time.Now().Format("20060102") + strconv.Itoa(rand.Intn(10000))
+}
+```
+
 ---
 
 ## 第六部分：Mock 数据方案
@@ -617,5 +954,6 @@ router.beforeEach((to, from, next) => {
 | 4 | 行政管理 | 2 天 |
 | 5 | 权限控制 | 1 天 |
 | 6 | 移动端适配 | 2 天 |
-| 7 | 联调测试 | 3 天 |
-| **总计** | | **20 天** |
+| 7 | Go后端开发 | 6 天 |
+| 8 | 联调测试 | 3 天 |
+| **总计** | | **26 天** |

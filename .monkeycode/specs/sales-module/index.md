@@ -796,6 +796,163 @@ export function getStoreStats(params) {
 }
 ```
 
+### 4.6 后端Go实现
+
+#### 目录结构
+```
+internal/
+├── handler/
+│   └── sales/
+│       ├── visit_handler.go
+│       ├── store_handler.go
+│       ├── customer_handler.go
+│       └── map_handler.go
+├── service/
+│   └── sales/
+│       ├── visit_service.go
+│       ├── store_service.go
+│       ├── customer_service.go
+│       └── map_service.go
+├── model/
+│   └── sales/
+│       ├── visit.go
+│       ├── store.go
+│       └── customer.go
+└── dto/
+    └── sales/
+        ├── visit_dto.go
+        ├── store_dto.go
+        └── customer_dto.go
+```
+
+#### 核心Handler示例
+```go
+// internal/handler/sales/visit_handler.go
+package sales
+
+import (
+    "net/http"
+    "github.com/gin-gonic/gin"
+    "your-project/internal/service/sales"
+    "your-project/internal/dto/sales"
+)
+
+type VisitHandler struct {
+    visitService *sales.VisitService
+}
+
+func NewVisitHandler(visitService *sales.VisitService) *VisitHandler {
+    return &VisitHandler{
+        visitService: visitService,
+    }
+}
+
+// GetVisits 获取拜访列表
+func (h *VisitHandler) GetVisits(c *gin.Context) {
+    var req sales.GetVisitsRequest
+    if err := c.ShouldBindQuery(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    
+    visits, total, err := h.visitService.GetVisits(c.Request.Context(), &req)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, gin.H{
+        "code": 200,
+        "message": "success",
+        "data": gin.H{
+            "list": visits,
+            "total": total,
+            "page": req.Page,
+            "pageSize": req.PageSize,
+        },
+    })
+}
+
+// CreateVisit 创建拜访记录
+func (h *VisitHandler) CreateVisit(c *gin.Context) {
+    var req sales.CreateVisitRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    
+    visit, err := h.visitService.CreateVisit(c.Request.Context(), &req)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, gin.H{
+        "code": 200,
+        "message": "success",
+        "data": visit,
+    })
+}
+```
+
+#### Service层示例
+```go
+// internal/service/sales/visit_service.go
+package sales
+
+import (
+    "context"
+    "your-project/internal/model/sales"
+    "your-project/internal/repository"
+)
+
+type VisitService struct {
+    visitRepo repository.VisitRepository
+}
+
+func NewVisitService(visitRepo repository.VisitRepository) *VisitService {
+    return &VisitService{
+        visitRepo: visitRepo,
+    }
+}
+
+func (s *VisitService) GetVisits(ctx context.Context, req *GetVisitsRequest) ([]*sales.Visit, int64, error) {
+    // 业务逻辑处理
+    visits, total, err := s.visitRepo.FindByConditions(ctx, req.ToQueryConditions())
+    if err != nil {
+        return nil, 0, err
+    }
+    
+    return visits, total, nil
+}
+
+func (s *VisitService) CreateVisit(ctx context.Context, req *CreateVisitRequest) (*sales.Visit, error) {
+    // 数据验证
+    if err := req.Validate(); err != nil {
+        return nil, err
+    }
+    
+    visit := &sales.Visit{
+        CustomerID:    req.CustomerID,
+        CustomerName:  req.CustomerName,
+        VisitType:     req.VisitType,
+        VisitMethod:   req.VisitMethod,
+        PlanDate:      req.PlanDate,
+        Subject:       req.Subject,
+        Content:       req.Content,
+        Status:        "draft",
+        CreatedBy:     req.CreatedBy,
+    }
+    
+    err := s.visitRepo.Create(ctx, visit)
+    if err != nil {
+        return nil, err
+    }
+    
+    return visit, nil
+}
+```
+
 ---
 
 ## 第五部分：Mock 数据方案
