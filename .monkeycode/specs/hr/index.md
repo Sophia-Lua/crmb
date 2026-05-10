@@ -171,9 +171,30 @@ interface Employee {
   entryDate: string;
   leaveDate?: string;
   status: 'active' | 'inactive' | 'terminated';
-  avatar?: string;
+  avatar?: string; // 员工头像URL，存储在MinIO中，格式为 /api/files/{filename}
+  documents: StaffDocument[]; // 证件扫描件，存储在MinIO中
   transferRecords: TransferRecord[];
 }
+
+interface StaffDocument {
+  id: string;
+  type: 'id_card' | 'diploma' | 'certificate' | 'contract'; // 身份证/学历证书/资格证书/合同
+  url: string; // MinIO文件URL，格式为 /api/files/{filename}
+  name: string;
+  expiryDate?: string; // 过期日期（如适用）
+  uploadedAt: string;
+}
+
+interface TransferRecord {
+  id: string;
+  fromDepartment: string;
+  toDepartment: string;
+  fromPosition: string;
+  toPosition: string;
+  reason: string;
+  effectiveDate: string;
+}
+```
 
 interface TransferRecord {
   id: string;

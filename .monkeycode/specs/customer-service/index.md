@@ -275,7 +275,7 @@ interface Complaint {
   type: 'quality' | 'service' | 'delivery' | 'other';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   content: string;
-  images?: string[];
+  images?: string[]; // 客诉图片URL数组，存储在MinIO中，格式为 /api/files/{filename}
   status: 'pending' | 'accepted' | 'processing' | 'resolved' | 'closed';
   assigneeId?: string;
   assigneeName?: string;

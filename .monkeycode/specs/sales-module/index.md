@@ -79,12 +79,20 @@ interface Visit {
   planTime?: string;
   subject: string;
   content: string;
-  images?: VisitImage[];
+  images?: VisitImage[]; // 图片存储在MinIO中，URL格式为 /api/files/{filename}
   feedback?: string;
   followUpPlan?: string;
   status: 'draft' | 'pending' | 'in_progress' | 'completed' | 'cancelled';
   createdBy: string;
   createdAt: string;
+}
+
+interface VisitImage {
+  id: string;
+  url: string; // MinIO文件URL
+  name: string;
+  size: number;
+  type: string;
 }
 ```
 
@@ -128,12 +136,20 @@ interface Store {
   area?: number;
   contactName: string;
   contactPhone: string;
-  licenses: StoreLicense[];
+  licenses: StoreLicense[]; // 资质图片存储在MinIO中，URL格式为 /api/files/{filename}
   status: 'unclaimed' | 'pending' | 'reviewing' | 'approved' | 'rejected';
   claimBy?: string;
   assignedTo?: string;
   reviewBy?: string;
   rejectReason?: string;
+}
+
+interface StoreLicense {
+  id: string;
+  url: string; // MinIO文件URL
+  name: string;
+  type: string; // 如：营业执照、食品经营许可证等
+  expiryDate?: string; // 过期日期
 }
 ```
 

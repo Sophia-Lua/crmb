@@ -228,9 +228,37 @@ interface Inventory {
   lastInDate?: string;
   lastOutDate?: string;
 }
+
+### 3.4 商品信息
+
+```typescript
+interface Product {
+  sku: string;
+  productName: string;
+  categoryId: string;
+  categoryName: string;
+  barcode: string;                           // 条形码
+  images: ProductImage[];                    // 商品图片存储在MinIO中
+  description: string;
+  specifications: Record<string, string>;    // 规格参数
+  weight: number;                           // 重量(kg)
+  volume: number;                           // 体积(m³)
+  shelfLife: number;                        // 保质期(天)
+  storageConditions: string;                // 存储条件
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ProductImage {
+  id: string;
+  url: string;                              // MinIO文件URL，格式为 /api/files/{filename}
+  name: string;
+  type: 'main' | 'detail' | 'packaging';   // 主图/详情图/包装图
+  sortOrder: number;
+}
 ```
 
-### 3.4 盘点单
+### 3.5 盘点单
 
 ```typescript
 interface Stocktake {

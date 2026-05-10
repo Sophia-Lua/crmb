@@ -122,6 +122,8 @@ interface Invoice {
   confirmByName?: string;
   secondConfirmBy?: string;
   secondConfirmByName?: string;
+  invoiceFile?: string; // 发票文件URL，存储在MinIO中，格式为 /api/files/{filename}
+  contractFile?: string; // 相关合同文件URL，存储在MinIO中
   createdAt: string;
   completedAt?: string;
 }
