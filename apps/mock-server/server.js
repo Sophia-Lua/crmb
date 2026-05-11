@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
+const mockData = require('./mock-data');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -14,146 +15,45 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 // Static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Simple mock data
-const mockData = {
-  products: [
-    {
-      id: "prod-001",
-      sku: "SKU000001",
-      name: "红富士苹果",
-      categoryId: "cat-001",
-      categoryName: "生鲜水果",
-      images: ["/api/files/product-1-1.jpg"],
-      description: "新鲜优质红富士苹果，产地直供",
-      price: 12.99,
-      vipPrice: 10.99,
-      superVipPrice: 8.99,
-      stock: 500,
-      status: "on_sale",
-      tags: ["生鲜水果", "热销"],
-      salesCount: 1200,
-      createdAt: "2025-01-15T10:30:00Z",
-      updatedAt: "2025-05-10T14:20:00Z"
-    },
-    {
-      id: "prod-002",
-      sku: "SKU000002",
-      name: "香蕉",
-      categoryId: "cat-001",
-      categoryName: "生鲜水果",
-      images: ["/api/files/product-2-1.jpg"],
-      description: "进口香蕉，香甜可口",
-      price: 8.50,
-      vipPrice: 7.20,
-      superVipPrice: 6.50,
-      stock: 300,
-      status: "on_sale",
-      tags: ["生鲜水果", "新品"],
-      salesCount: 800,
-      createdAt: "2025-02-20T09:15:00Z",
-      updatedAt: "2025-05-09T11:45:00Z"
-    }
-  ],
-  stores: [
-    {
-      id: "store-001",
-      storeName: "永辉超市分店",
-      storeType: "supermarket",
-      address: "北京市朝阳区中山路123号",
-      province: "北京市",
-      city: "朝阳区",
-      district: "朝阳区",
-      latitude: 39.9042,
-      longitude: 116.4074,
-      area: 200,
-      contactName: "联系人1",
-      contactPhone: "13800138001",
-      licenses: [
-        {
-          id: "license-1-1",
-          url: "/api/files/license-1-1.jpg",
-          name: "营业执照.jpg",
-          type: "营业执照",
-          expiryDate: "2027-12-31T00:00:00Z"
-        }
-      ],
-      status: "approved",
-      assignedTo: "sales-001",
-      createdAt: "2025-03-10T08:20:00Z"
-    }
-  ],
-  orders: [
-    {
-      id: "order-001",
-      orderNo: "ORD2025000001",
-      userId: "cust-001",
-      items: [
-        {
-          id: "item-001",
-          productId: "prod-001",
-          sku: "SKU000001",
-          productName: "红富士苹果",
-          image: "/api/files/product-1-1.jpg",
-          price: 12.99,
-          quantity: 5
-        }
-      ],
-      totalAmount: 64.95,
-      discountAmount: 5.00,
-      freight: 10.00,
-      payAmount: 69.95,
-      status: "completed",
-      payType: "wechat",
-      payTime: "2025-05-08T14:30:00Z",
-      address: {
-        name: "张三",
-        phone: "13800138001",
-        province: "北京市",
-        city: "朝阳区",
-        district: "朝阳区",
-        address: "中山路123号",
-        isDefault: true
-      },
-      createdAt: "2025-05-08T14:20:00Z",
-      paidAt: "2025-05-08T14:30:00Z",
-      completedAt: "2025-05-10T16:45:00Z"
-    }
-  ]
+// Helper function for pagination
+const paginate = (data, page = 1, pageSize = 20) => {
+  const total = data.length;
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize;
+  const paginatedData = data.slice(start, end);
+  
+  return {
+    list: paginatedData,
+    total,
+    page: parseInt(page),
+    pageSize: parseInt(pageSize)
+  };
 };
 
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'ok', 
-    message: 'Mock server is running with realistic data',
+    message: 'Mock server is running with realistic business data',
     timestamp: new Date().toISOString()
   });
 });
 
-// Mall module - products
+// === MALL MODULE ===
+// Products
 app.get('/api/mall/products', (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const pageSize = parseInt(req.query.pageSize) || 20;
-  const data = mockData.products;
-  const total = data.length;
-  const start = (page - 1) * pageSize;
-  const end = start + pageSize;
-  const paginatedData = data.slice(start, end);
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.mall.products, page, pageSize);
   
   res.json({
     code: 200,
     message: 'success',
-    data: {
-      list: paginatedData,
-      total,
-      page,
-      pageSize
-    }
+    data: result
   });
 });
 
 app.get('/api/mall/products/:id', (req, res) => {
-  const product = mockData.products.find(p => p.id === req.params.id);
+  const product = mockData.mall.products.find(p => p.id === req.params.id);
   if (product) {
     res.json({
       code: 200,
@@ -168,31 +68,159 @@ app.get('/api/mall/products/:id', (req, res) => {
   }
 });
 
-// Customer service - orders
-app.get('/api/customer-service/orders', (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const pageSize = parseInt(req.query.pageSize) || 20;
-  const data = mockData.orders;
-  const total = data.length;
-  const start = (page - 1) * pageSize;
-  const end = start + pageSize;
-  const paginatedData = data.slice(start, end);
-  
+// Categories
+app.get('/api/mall/categories', (req, res) => {
   res.json({
     code: 200,
     message: 'success',
     data: {
-      list: paginatedData,
-      total,
-      page,
-      pageSize
+      list: mockData.mall.categories,
+      total: mockData.mall.categories.length
     }
   });
 });
 
-// Sales module - stores
-app.get('/api/sales-module/stores/unclaimed', (req, res) => {
-  const unclaimedStores = mockData.stores.filter(store => store.status === 'unclaimed');
+// Banners
+app.get('/api/mall/home/banner', (req, res) => {
+  res.json({
+    code: 200,
+    message: 'success',
+    data: {
+      list: mockData.mall.banners,
+      total: mockData.mall.banners.length
+    }
+  });
+});
+
+// Announcements
+app.get('/api/mall/home/announcements', (req, res) => {
+  res.json({
+    code: 200,
+    message: 'success',
+    data: {
+      list: mockData.mall.announcements,
+      total: mockData.mall.announcements.length
+    }
+  });
+});
+
+// VIP Packages
+app.get('/api/mall/vip/info', (req, res) => {
+  res.json({
+    code: 200,
+    message: 'success',
+    data: {
+      packages: mockData.mall.vipPackages,
+      userVip: null // No VIP info for demo
+    }
+  });
+});
+
+// === CUSTOMER SERVICE MODULE ===
+// Orders
+app.get('/api/customer-service/orders', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.customerService.orders, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+app.get('/api/customer-service/orders/:id', (req, res) => {
+  const order = mockData.customerService.orders.find(o => o.id === req.params.id);
+  if (order) {
+    res.json({
+      code: 200,
+      message: 'success',
+      data: order
+    });
+  } else {
+    res.status(404).json({
+      code: 404,
+      message: 'Order not found'
+    });
+  }
+});
+
+// After Sales
+app.get('/api/customer-service/after-sales', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.customerService.afterSales, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// Complaints
+app.get('/api/customer-service/complaints', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.customerService.complaints, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// Reviews
+app.get('/api/customer-service/reviews', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.customerService.reviews, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// Feedback
+app.get('/api/customer-service/feedbacks', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.customerService.feedbacks, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// Invoices
+app.get('/api/customer-service/invoices', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.customerService.invoices, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// === SALES MODULE ===
+// Visits
+app.get('/api/sales/visits', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.sales.visits, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// Stores - Unclaimed
+app.get('/api/sales/stores/unclaimed', (req, res) => {
+  const unclaimedStores = mockData.sales.stores.filter(store => store.status === 'unclaimed');
   res.json({
     code: 200,
     message: 'success',
@@ -203,8 +231,9 @@ app.get('/api/sales-module/stores/unclaimed', (req, res) => {
   });
 });
 
-app.get('/api/sales-module/stores/review', (req, res) => {
-  const reviewStores = mockData.stores.filter(store => store.status === 'pending');
+// Stores - Review
+app.get('/api/sales/stores/review', (req, res) => {
+  const reviewStores = mockData.sales.stores.filter(store => store.status === 'pending');
   res.json({
     code: 200,
     message: 'success',
@@ -215,21 +244,176 @@ app.get('/api/sales-module/stores/review', (req, res) => {
   });
 });
 
-// Generic fallback for other modules
-const modules = ['finance', 'hr', 'cloud-warehouse', 'procurement', 'payment', 'operations', 'data-center', 'direct-delivery', 'supplier'];
+// Stores - All
+app.get('/api/sales/stores', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.sales.stores, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
 
-modules.forEach(module => {
-  app.get(`/api/${module}`, (req, res) => {
-    res.json({
-      code: 200,
-      message: 'success',
-      data: {
-        list: [],
-        total: 0,
-        page: 1,
-        pageSize: 20
-      }
-    });
+// Customers - Public (unassigned)
+app.get('/api/sales/customers/public', (req, res) => {
+  const publicCustomers = mockData.sales.customers.filter(cust => !cust.assignedTo);
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(publicCustomers, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// Customers - Private (assigned)
+app.get('/api/sales/customers/private', (req, res) => {
+  const privateCustomers = mockData.sales.customers.filter(cust => cust.assignedTo);
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(privateCustomers, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// Special Stock Requests
+app.get('/api/sales/special-stock-requests', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.sales.specialStockRequests, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// Blacklist
+app.get('/api/sales/blacklist', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.sales.blacklist, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// === FINANCE MODULE ===
+// Transactions
+app.get('/api/finance/transactions', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.finance.transactions, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// Reconciliations
+app.get('/api/finance/reconciliations', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.finance.reconciliations, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// Reports
+app.get('/api/finance/reports', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.finance.reports, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// === HR MODULE ===
+// Employees
+app.get('/api/hr/employees', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.hr.employees, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// Attendance
+app.get('/api/hr/attendance', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.hr.attendanceRecords, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// Performance
+app.get('/api/hr/performance', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.hr.performanceReviews, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// === CLOUD WAREHOUSE MODULE ===
+// Inventory
+app.get('/api/cloud-warehouse/inventory', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.cloudWarehouse.inventory, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// Outbound Orders
+app.get('/api/cloud-warehouse/outbound', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.cloudWarehouse.outboundOrders, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
+  });
+});
+
+// Inbound Orders
+app.get('/api/cloud-warehouse/inbound', (req, res) => {
+  const { page = 1, pageSize = 20 } = req.query;
+  const result = paginate(mockData.cloudWarehouse.inboundOrders, page, pageSize);
+  
+  res.json({
+    code: 200,
+    message: 'success',
+    data: result
   });
 });
 
@@ -256,6 +440,23 @@ app.get('/api/files/:filename', (req, res) => {
   });
 });
 
+// Generic fallback for other modules
+const otherModules = ['procurement', 'payment', 'operations', 'data-center', 'direct-delivery', 'supplier'];
+otherModules.forEach(module => {
+  app.get(`/api/${module}`, (req, res) => {
+    res.json({
+      code: 200,
+      message: 'success',
+      data: {
+        list: [],
+        total: 0,
+        page: 1,
+        pageSize: 20
+      }
+    });
+  });
+});
+
 // Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -266,15 +467,15 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, '127.0.0.1', () => {
-  console.log(`Mock server running on http://127.0.0.1:${PORT}`);
-  console.log('Available endpoints:');
-  console.log('- /api/health');
-  console.log('- /api/mall/products');
-  console.log('- /api/customer-service/orders');
-  console.log('- /api/sales-module/stores/unclaimed');
-  console.log('- /api/sales-module/stores/review');
-  console.log('- /api/files/upload');
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Mock server running on http://0.0.0.0:${PORT}`);
+  console.log('Available modules with realistic data:');
+  console.log('- mall (products, categories, banners, announcements, VIP)');
+  console.log('- customer-service (orders, after-sales, complaints, reviews, feedback, invoices)');
+  console.log('- sales (visits, stores, customers, special requests, blacklist)');
+  console.log('- finance (transactions, reconciliations, reports)');
+  console.log('- hr (employees, attendance, performance)');
+  console.log('- cloud-warehouse (inventory, outbound, inbound)');
 });
 
 module.exports = app;
