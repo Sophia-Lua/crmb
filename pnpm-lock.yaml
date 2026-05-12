@@ -122,7 +122,7 @@ importers:
         specifier: ^1.4.5-lts.1
         version: 1.4.5-lts.2
       uuid:
-        specifier: ^9.0.0
+        specifier: ^9.0.1
         version: 9.0.1
     devDependencies:
       nodemon:
