@@ -31,15 +31,51 @@
       }
     },
     {
-      "path": "pages/sales/list",
+      "path": "pages/sales/visits/list",
       "style": {
-        "navigationBarTitleText": "销售管理"
+        "navigationBarTitleText": "拜访记录"
       }
     },
     {
-      "path": "pages/sales/detail",
+      "path": "pages/sales/visits/detail",
       "style": {
-        "navigationBarTitleText": "销售详情"
+        "navigationBarTitleText": "拜访详情"
+      }
+    },
+    {
+      "path": "pages/sales/stores/unclaimed",
+      "style": {
+        "navigationBarTitleText": "待领取店铺"
+      }
+    },
+    {
+      "path": "pages/sales/stores/detail",
+      "style": {
+        "navigationBarTitleText": "店铺详情"
+      }
+    },
+    {
+      "path": "pages/sales/customers/public",
+      "style": {
+        "navigationBarTitleText": "公海客户"
+      }
+    },
+    {
+      "path": "pages/sales/customers/private",
+      "style": {
+        "navigationBarTitleText": "私海客户"
+      }
+    },
+    {
+      "path": "pages/sales/customers/detail",
+      "style": {
+        "navigationBarTitleText": "客户详情"
+      }
+    },
+    {
+      "path": "pages/sales/map/index",
+      "style": {
+        "navigationBarTitleText": "销售地图"
       }
     }
   ],
