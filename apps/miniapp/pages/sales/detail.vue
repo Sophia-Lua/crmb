@@ -106,7 +106,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { useSalesStore } from '@/stores/sales'
+import { useSalesStore } from '../../stores/sales'
 
 const salesStore = useSalesStore()
 const salesDetail = ref({})

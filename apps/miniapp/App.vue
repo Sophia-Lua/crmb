@@ -14,7 +14,7 @@
 
 <style>
   /* 全局样式 */
-  @import '@/uni.scss';
+  @import './uni.scss';
   
   /* 全局通用样式 */
   page {

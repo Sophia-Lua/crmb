@@ -54,7 +54,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useSalesStore } from '@/stores/sales'
+import { useSalesStore } from '../../stores/sales'
 
 const salesStore = useSalesStore()
 const searchKeyword = ref('')
