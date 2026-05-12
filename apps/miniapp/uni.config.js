@@ -10,7 +10,9 @@ const config = {
     'pages/category/index',
     'pages/cart/index',
     'pages/order/list',
-    'pages/mine/index'
+    'pages/mine/index',
+    'pages/sales/list',
+    'pages/sales/detail'
   ],
   
   // tabBar配置

@@ -21,6 +21,7 @@
   "devDependencies": {
     "@dcloudio/types": "^3.4.31",
     "@dcloudio/uni-cli-shared": "3.0.0-alpha-5000820260508001",
+    "@dcloudio/uni-cli": "3.0.0-alpha-5000820260508001",
     "vue": "^3.0.0",
     "typescript": "^5.0.0"
   }
