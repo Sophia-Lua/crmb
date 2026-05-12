@@ -132,7 +132,7 @@ app.get('/api/mall/cart', (req, res) => {
       userId: 'user-001',
       items: [],
       totalAmount: 0,
-      selectedItems: [],
+      selectedItems: [], // 已勾选的商品 ID
       updatedAt: new Date().toISOString()
     }
   });
@@ -234,8 +234,10 @@ app.post('/api/mall/orders', (req, res) => {
       totalAmount: 100.00,
       discountAmount: couponId ? 10.00 : 0.00,
       freight: 10.00,
-      payAmount: 100.00,
+      payAmount: 90.00,
       status: 'pending',
+      payType: null,
+      payTime: null,
       address: address || {
         name: '张三',
         phone: '13800138001',
@@ -248,7 +250,12 @@ app.post('/api/mall/orders', (req, res) => {
       couponId: couponId || null,
       couponDiscount: couponId ? 10.00 : 0.00,
       remark: '',
-      createdAt: new Date().toISOString()
+      logistics: null,
+      createdAt: new Date().toISOString(),
+      paidAt: null,
+      shippedAt: null,
+      deliveredAt: null,
+      completedAt: null
     }
   });
 });

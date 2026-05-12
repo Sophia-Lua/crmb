@@ -931,6 +931,12 @@ const mockData = {
         createdAt: '2025-05-08T14:25:00Z'
       }
     ],
+        status: 'completed',
+        warehouseId: 'WH-001',
+        operatorId: 'emp-002',
+        createdAt: '2025-05-08T14:25:00Z'
+      }
+    ],
     
     // Inbound Orders
     inboundOrders: [
@@ -946,6 +952,12 @@ const mockData = {
             batchNo: 'BATCH20250510'
           }
         ],
+        status: 'pending',
+        warehouseId: 'WH-001',
+        operatorId: 'emp-002',
+        createdAt: '2025-05-10T11:25:00Z'
+      }
+    ]
         status: 'pending',
         warehouseId: 'WH-001',
         operatorId: 'emp-002',
