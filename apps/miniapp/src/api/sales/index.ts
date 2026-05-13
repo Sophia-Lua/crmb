@@ -1,7 +1,7 @@
 import request from '../request'
 
 // 拜访记录 API
-export function getVisits(params) {
+export function getVisits(params: Record<string, any>) {
   return request({
     url: '/api/sales/visits',
     method: 'get',
@@ -9,14 +9,14 @@ export function getVisits(params) {
   })
 }
 
-export function getVisitDetail(id) {
+export function getVisitDetail(id: string) {
   return request({
     url: `/api/sales/visits/${id}`,
     method: 'get'
   })
 }
 
-export function createVisit(data) {
+export function createVisit(data: Record<string, any>) {
   return request({
     url: '/api/sales/visits',
     method: 'post',
@@ -24,7 +24,7 @@ export function createVisit(data) {
   })
 }
 
-export function updateVisit(id, data) {
+export function updateVisit(id: string, data: Record<string, any>) {
   return request({
     url: `/api/sales/visits/${id}`,
     method: 'put',
@@ -32,7 +32,7 @@ export function updateVisit(id, data) {
   })
 }
 
-export function deleteVisit(id) {
+export function deleteVisit(id: string) {
   return request({
     url: `/api/sales/visits/${id}`,
     method: 'delete'
@@ -47,7 +47,7 @@ export function getVisitStatistics() {
 }
 
 // 店铺管理 API
-export function getUnclaimedStores(params) {
+export function getUnclaimedStores(params: Record<string, any>) {
   return request({
     url: '/api/sales/stores/unclaimed',
     method: 'get',
@@ -55,7 +55,7 @@ export function getUnclaimedStores(params) {
   })
 }
 
-export function getReviewStores(params) {
+export function getReviewStores(params: Record<string, any>) {
   return request({
     url: '/api/sales/stores/review',
     method: 'get',
@@ -63,21 +63,21 @@ export function getReviewStores(params) {
   })
 }
 
-export function getStoreDetail(id) {
+export function getStoreDetail(id: string) {
   return request({
     url: `/api/sales/stores/${id}`,
     method: 'get'
   })
 }
 
-export function claimStore(id) {
+export function claimStore(id: string) {
   return request({
     url: `/api/sales/stores/${id}/claim`,
     method: 'post'
   })
 }
 
-export function reviewStore(id, data) {
+export function reviewStore(id: string, data: Record<string, any>) {
   return request({
     url: `/api/sales/stores/${id}/review`,
     method: 'post',
@@ -85,7 +85,7 @@ export function reviewStore(id, data) {
   })
 }
 
-export function assignStore(id, data) {
+export function assignStore(id: string, data: Record<string, any>) {
   return request({
     url: `/api/sales/stores/${id}/assign`,
     method: 'post',
@@ -101,7 +101,7 @@ export function getStoreStatistics() {
 }
 
 // 客户管理 API
-export function getPublicCustomers(params) {
+export function getPublicCustomers(params: Record<string, any>) {
   return request({
     url: '/api/sales/customers/public',
     method: 'get',
@@ -109,7 +109,7 @@ export function getPublicCustomers(params) {
   })
 }
 
-export function getPrivateCustomers(params) {
+export function getPrivateCustomers(params: Record<string, any>) {
   return request({
     url: '/api/sales/customers/private',
     method: 'get',
@@ -117,28 +117,28 @@ export function getPrivateCustomers(params) {
   })
 }
 
-export function getCustomerDetail(id) {
+export function getCustomerDetail(id: string) {
   return request({
     url: `/api/sales/customers/${id}`,
     method: 'get'
   })
 }
 
-export function claimCustomer(id) {
+export function claimCustomer(id: string) {
   return request({
     url: `/api/sales/customers/${id}/claim`,
     method: 'post'
   })
 }
 
-export function returnCustomerToPublic(id) {
+export function returnCustomerToPublic(id: string) {
   return request({
     url: `/api/sales/customers/${id}/return`,
     method: 'post'
   })
 }
 
-export function transferCustomer(id, data) {
+export function transferCustomer(id: string, data: Record<string, any>) {
   return request({
     url: `/api/sales/customers/${id}/transfer`,
     method: 'post',
@@ -146,7 +146,7 @@ export function transferCustomer(id, data) {
   })
 }
 
-export function searchCustomers(params) {
+export function searchCustomers(params: Record<string, any>) {
   return request({
     url: '/api/sales/customers/search',
     method: 'get',
@@ -155,7 +155,7 @@ export function searchCustomers(params) {
 }
 
 // 销售地图 API
-export function getMapCustomers(params) {
+export function getMapCustomers(params: Record<string, any>) {
   return request({
     url: '/api/sales/map/customers',
     method: 'get',
@@ -163,7 +163,7 @@ export function getMapCustomers(params) {
   })
 }
 
-export function getUnregisteredStores(params) {
+export function getUnregisteredStores(params: Record<string, any>) {
   return request({
     url: '/api/sales/map/unregistered',
     method: 'get',
@@ -171,7 +171,7 @@ export function getUnregisteredStores(params) {
   })
 }
 
-export function getMapMarkerDetail(id) {
+export function getMapMarkerDetail(id: string) {
   return request({
     url: `/api/sales/markers/${id}`,
     method: 'get'
@@ -179,7 +179,7 @@ export function getMapMarkerDetail(id) {
 }
 
 // 其他子模块 API
-export function getComplaints(params) {
+export function getComplaints(params: Record<string, any>) {
   return request({
     url: '/api/sales/complaints',
     method: 'get',
@@ -187,7 +187,7 @@ export function getComplaints(params) {
   })
 }
 
-export function getSpecialStockRequests(params) {
+export function getSpecialStockRequests(params: Record<string, any>) {
   return request({
     url: '/api/sales/special-stock-requests',
     method: 'get',
@@ -195,7 +195,7 @@ export function getSpecialStockRequests(params) {
   })
 }
 
-export function getBlacklist(params) {
+export function getBlacklist(params: Record<string, any>) {
   return request({
     url: '/api/sales/blacklist',
     method: 'get',

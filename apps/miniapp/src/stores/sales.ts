@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 import {
   getVisits,
   getVisitDetail,
@@ -13,6 +13,7 @@ import {
   claimStore,
   reviewStore,
   assignStore,
+  getStoreStatistics,
   getPublicCustomers,
   getPrivateCustomers,
   getCustomerDetail,
@@ -21,6 +22,7 @@ import {
   transferCustomer,
   getMapCustomers,
   getUnregisteredStores,
+  getMapMarkerDetail,
   getComplaints,
   getSpecialStockRequests,
   getBlacklist
@@ -28,32 +30,32 @@ import {
 
 export const useSalesStore = defineStore('sales', () => {
   // 拜访记录相关状态
-  const visits = ref([])
-  const currentVisit = ref(null)
-  const visitStatistics = ref({})
-  
+  const visits = ref<any[]>([])
+  const currentVisit = ref<any>(null)
+  const visitStatistics = ref<Record<string, any>>({})
+
   // 店铺管理相关状态
-  const unclaimedStores = ref([])
-  const reviewStores = ref([])
-  const currentStore = ref(null)
-  const storeStatistics = ref({})
-  
+  const unclaimedStores = ref<any[]>([])
+  const reviewStores = ref<any[]>([])
+  const currentStore = ref<any>(null)
+  const storeStatistics = ref<Record<string, any>>({})
+
   // 客户管理相关状态
-  const publicCustomers = ref([])
-  const privateCustomers = ref([])
-  const currentCustomer = ref(null)
-  
+  const publicCustomers = ref<any[]>([])
+  const privateCustomers = ref<any[]>([])
+  const currentCustomer = ref<any>(null)
+
   // 销售地图相关状态
-  const mapCustomers = ref([])
-  const unregisteredStores = ref([])
-  
+  const mapCustomers = ref<any[]>([])
+  const unregisteredStores = ref<any[]>([])
+
   // 其他子模块状态
-  const complaints = ref([])
-  const specialStockRequests = ref([])
-  const blacklist = ref([])
-  
+  const complaints = ref<any[]>([])
+  const specialStockRequests = ref<any[]>([])
+  const blacklist = ref<any[]>([])
+
   // 拜访记录相关方法
-  const fetchVisits = async (params = {}) => {
+  const fetchVisits = async (params: Record<string, any> = {}) => {
     try {
       const response = await getVisits(params)
       visits.value = response.data || []
@@ -63,8 +65,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const fetchVisitDetail = async (id) => {
+
+  const fetchVisitDetail = async (id: string) => {
     if (!id) {
       throw new Error('拜访ID不能为空')
     }
@@ -77,8 +79,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const createNewVisit = async (data) => {
+
+  const createNewVisit = async (data: Record<string, any>) => {
     try {
       const response = await createVisit(data)
       return response
@@ -87,8 +89,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const updateVisitRecord = async (id, data) => {
+
+  const updateVisitRecord = async (id: string, data: Record<string, any>) => {
     try {
       const response = await updateVisit(id, data)
       return response
@@ -97,8 +99,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const deleteVisitRecord = async (id) => {
+
+  const deleteVisitRecord = async (id: string) => {
     try {
       const response = await deleteVisit(id)
       return response
@@ -107,7 +109,7 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
+
   const fetchVisitStatistics = async () => {
     try {
       const response = await getVisitStatistics()
@@ -118,9 +120,9 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
+
   // 店铺管理相关方法
-  const fetchUnclaimedStores = async (params = {}) => {
+  const fetchUnclaimedStores = async (params: Record<string, any> = {}) => {
     try {
       const response = await getUnclaimedStores(params)
       unclaimedStores.value = response.data || []
@@ -130,8 +132,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const fetchReviewStores = async (params = {}) => {
+
+  const fetchReviewStores = async (params: Record<string, any> = {}) => {
     try {
       const response = await getReviewStores(params)
       reviewStores.value = response.data || []
@@ -141,8 +143,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const fetchStoreDetail = async (id) => {
+
+  const fetchStoreDetail = async (id: string) => {
     if (!id) {
       throw new Error('店铺ID不能为空')
     }
@@ -155,8 +157,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const claimStoreAction = async (id) => {
+
+  const claimStoreAction = async (id: string) => {
     try {
       const response = await claimStore(id)
       return response
@@ -165,8 +167,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const reviewStoreAction = async (id, data) => {
+
+  const reviewStoreAction = async (id: string, data: Record<string, any>) => {
     try {
       const response = await reviewStore(id, data)
       return response
@@ -175,8 +177,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const assignStoreAction = async (id, data) => {
+
+  const assignStoreAction = async (id: string, data: Record<string, any>) => {
     try {
       const response = await assignStore(id, data)
       return response
@@ -185,7 +187,7 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
+
   const fetchStoreStatistics = async () => {
     try {
       const response = await getStoreStatistics()
@@ -196,9 +198,9 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
+
   // 客户管理相关方法
-  const fetchPublicCustomers = async (params = {}) => {
+  const fetchPublicCustomers = async (params: Record<string, any> = {}) => {
     try {
       const response = await getPublicCustomers(params)
       publicCustomers.value = response.data || []
@@ -208,8 +210,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const fetchPrivateCustomers = async (params = {}) => {
+
+  const fetchPrivateCustomers = async (params: Record<string, any> = {}) => {
     try {
       const response = await getPrivateCustomers(params)
       privateCustomers.value = response.data || []
@@ -219,8 +221,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const fetchCustomerDetail = async (id) => {
+
+  const fetchCustomerDetail = async (id: string) => {
     if (!id) {
       throw new Error('客户ID不能为空')
     }
@@ -233,8 +235,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const claimCustomerAction = async (id) => {
+
+  const claimCustomerAction = async (id: string) => {
     try {
       const response = await claimCustomer(id)
       return response
@@ -243,8 +245,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const returnCustomerAction = async (id) => {
+
+  const returnCustomerAction = async (id: string) => {
     try {
       const response = await returnCustomerToPublic(id)
       return response
@@ -253,8 +255,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const transferCustomerAction = async (id, data) => {
+
+  const transferCustomerAction = async (id: string, data: Record<string, any>) => {
     try {
       const response = await transferCustomer(id, data)
       return response
@@ -263,8 +265,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const searchCustomersAction = async (params = {}) => {
+
+  const searchCustomersAction = async (params: Record<string, any> = {}) => {
     try {
       const response = await searchCustomers(params)
       return response
@@ -273,9 +275,9 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
+
   // 销售地图相关方法
-  const fetchMapCustomers = async (params = {}) => {
+  const fetchMapCustomers = async (params: Record<string, any> = {}) => {
     try {
       const response = await getMapCustomers(params)
       mapCustomers.value = response.data || []
@@ -285,8 +287,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const fetchUnregisteredStores = async (params = {}) => {
+
+  const fetchUnregisteredStores = async (params: Record<string, any> = {}) => {
     try {
       const response = await getUnregisteredStores(params)
       unregisteredStores.value = response.data || []
@@ -296,8 +298,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const fetchMapMarkerDetail = async (id) => {
+
+  const fetchMapMarkerDetail = async (id: string) => {
     try {
       const response = await getMapMarkerDetail(id)
       return response
@@ -306,9 +308,9 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
+
   // 其他子模块方法
-  const fetchComplaints = async (params = {}) => {
+  const fetchComplaints = async (params: Record<string, any> = {}) => {
     try {
       const response = await getComplaints(params)
       complaints.value = response.data || []
@@ -318,8 +320,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const fetchSpecialStockRequests = async (params = {}) => {
+
+  const fetchSpecialStockRequests = async (params: Record<string, any> = {}) => {
     try {
       const response = await getSpecialStockRequests(params)
       specialStockRequests.value = response.data || []
@@ -329,8 +331,8 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
-  const fetchBlacklist = async (params = {}) => {
+
+  const fetchBlacklist = async (params: Record<string, any> = {}) => {
     try {
       const response = await getBlacklist(params)
       blacklist.value = response.data || []
@@ -340,7 +342,7 @@ export const useSalesStore = defineStore('sales', () => {
       throw error
     }
   }
-  
+
   return {
     // 状态
     visits,
@@ -358,7 +360,7 @@ export const useSalesStore = defineStore('sales', () => {
     complaints,
     specialStockRequests,
     blacklist,
-    
+
     // 拜访记录方法
     fetchVisits,
     fetchVisitDetail,
@@ -366,7 +368,7 @@ export const useSalesStore = defineStore('sales', () => {
     updateVisitRecord,
     deleteVisitRecord,
     fetchVisitStatistics,
-    
+
     // 店铺管理方法
     fetchUnclaimedStores,
     fetchReviewStores,
@@ -375,7 +377,7 @@ export const useSalesStore = defineStore('sales', () => {
     reviewStoreAction,
     assignStoreAction,
     fetchStoreStatistics,
-    
+
     // 客户管理方法
     fetchPublicCustomers,
     fetchPrivateCustomers,
@@ -384,12 +386,12 @@ export const useSalesStore = defineStore('sales', () => {
     returnCustomerAction,
     transferCustomerAction,
     searchCustomersAction,
-    
+
     // 销售地图方法
     fetchMapCustomers,
     fetchUnregisteredStores,
     fetchMapMarkerDetail,
-    
+
     // 其他子模块方法
     fetchComplaints,
     fetchSpecialStockRequests,

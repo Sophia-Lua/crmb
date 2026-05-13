@@ -32,24 +32,24 @@
   </view>
 </template>
 
-<script setup>
-const gotoVisits = () => {
+<script setup lang="ts">
+const gotoVisits = (): void => {
   uni.navigateTo({
     url: '/pages/sales/visits/list'
   })
 }
 
-const gotoStores = () => {
+const gotoStores = (): void => {
   uni.navigateTo({
     url: '/pages/sales/stores/unclaimed'
   })
 }
 
-const gotoCustomers = () => {
+const gotoCustomers = (): void => {
   // 显示选择公海还是私海
   uni.showActionSheet({
     itemList: ['公海客户', '私海客户'],
-    success: function (res) {
+    success: function (res: any) {
       if (res.tapIndex === 0) {
         uni.navigateTo({
           url: '/pages/sales/customers/public'
@@ -63,7 +63,7 @@ const gotoCustomers = () => {
   })
 }
 
-const gotoMap = () => {
+const gotoMap = (): void => {
   uni.navigateTo({
     url: '/pages/sales/map/index'
   })

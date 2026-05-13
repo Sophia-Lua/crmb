@@ -62,20 +62,33 @@
   </view>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useSalesStore } from '../../stores/sales'
 
+interface Visit {
+  id: string
+  customerName: string
+  visitType: string
+  planDate: string
+}
+
+interface Stats {
+  todayVisits: number
+  publicCustomers: number
+  unclaimedStores: number
+}
+
 const salesStore = useSalesStore()
-const stats = ref({
+const stats = ref<Stats>({
   todayVisits: 0,
   publicCustomers: 0,
   unclaimedStores: 0
 })
-const recentVisits = ref([])
+const recentVisits = ref<Visit[]>([])
 
 // 获取统计数据
-const fetchStats = async () => {
+const fetchStats = async (): Promise<void> => {
   try {
     // 模拟统计数据（实际项目中应该调用API）
     stats.value = {
@@ -111,15 +124,15 @@ const fetchStats = async () => {
 }
 
 // 格式化日期
-const formatDate = (dateString) => {
+const formatDate = (dateString: string): string => {
   if (!dateString) return ''
   const date = new Date(dateString)
   return `${date.getMonth() + 1}月${date.getDate()}日`
 }
 
 // 获取拜访类型文本
-const getVisitTypeText = (type) => {
-  const typeMap = {
+const getVisitTypeText = (type: string): string => {
+  const typeMap: Record<string, string> = {
     first: '首次拜访',
     regular: '定期回访',
     temporary: '临时拜访',
@@ -129,31 +142,31 @@ const getVisitTypeText = (type) => {
 }
 
 // 跳转函数
-const gotoVisits = () => {
+const gotoVisits = (): void => {
   uni.navigateTo({
     url: '/pages/sales/visits/list'
   })
 }
 
-const gotoPublicCustomers = () => {
+const gotoPublicCustomers = (): void => {
   uni.navigateTo({
     url: '/pages/sales/customers/public'
   })
 }
 
-const gotoUnclaimedStores = () => {
+const gotoUnclaimedStores = (): void => {
   uni.navigateTo({
     url: '/pages/sales/stores/unclaimed'
   })
 }
 
-const gotoMap = () => {
+const gotoMap = (): void => {
   uni.navigateTo({
     url: '/pages/sales/map/index'
   })
 }
 
-const gotoVisitDetail = (id) => {
+const gotoVisitDetail = (id: string): void => {
   uni.navigateTo({
     url: `/pages/sales/visits/detail?id=${id}`
   })

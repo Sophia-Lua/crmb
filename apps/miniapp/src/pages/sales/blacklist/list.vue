@@ -74,33 +74,49 @@
   </view>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useSalesStore } from '../../stores/sales'
 
+interface BlacklistItem {
+  id: string
+  customerName: string
+  customerId: string
+  reason: string
+  blacklistedBy: string
+  blacklistedAt: string
+}
+
+interface FetchParams {
+  keyword: string
+  reason?: string
+  page: number
+  pageSize: number
+}
+
 const salesStore = useSalesStore()
-const loading = ref(false)
-const hasMore = ref(true)
-const currentPage = ref(1)
+const loading = ref<boolean>(false)
+const hasMore = ref<boolean>(true)
+const currentPage = ref<number>(1)
 
 // 筛选条件
-const searchKeyword = ref('')
-const reason = ref('')
+const searchKeyword = ref<string>('')
+const reason = ref<string>('')
 
 // 选项配置
-const reasonOptions = ['全部', '恶意投诉', '恶意退货', '虚假订单', '其他']
+const reasonOptions: string[] = ['全部', '恶意投诉', '恶意退货', '虚假订单', '其他']
 
 // 计算属性
-const reasonText = ref('全部')
+const reasonText = ref<string>('全部')
 
-const blacklist = ref([])
+const blacklist = ref<BlacklistItem[]>([])
 
 // 获取黑名单列表
-const fetchBlacklist = async (reset = false) => {
+const fetchBlacklist = async (reset: boolean = false): Promise<void> => {
   loading.value = true
   try {
-    const params = {
+    const params: FetchParams = {
       keyword: searchKeyword.value,
       reason: reason.value || undefined,
       page: reset ? 1 : currentPage.value,
@@ -129,37 +145,37 @@ const fetchBlacklist = async (reset = false) => {
 }
 
 // 筛选条件变更
-const onReasonChange = (e) => {
-  const index = e.detail.value
+const onReasonChange = (e: any): void => {
+  const index: number = e.detail.value
   reasonText.value = reasonOptions[index]
   reason.value = index === 0 ? '' : reasonOptions[index]
   handleSearch()
 }
 
 // 搜索
-const handleSearch = () => {
+const handleSearch = (): void => {
   fetchBlacklist(true)
 }
 
 // 加载更多
-const loadMore = () => {
+const loadMore = (): void => {
   if (!hasMore.value || loading.value) return
   fetchBlacklist()
 }
 
 // 跳转详情
-const gotoDetail = (id) => {
+const gotoDetail = (id: string): void => {
   uni.navigateTo({
     url: `/pages/sales/blacklist/detail?id=${id}`
   })
 }
 
 // 移除黑名单
-const removeFromBlacklist = async (id) => {
+const removeFromBlacklist = async (id: string): Promise<void> => {
   uni.showModal({
     title: '确认移除',
     content: '确定要将此客户移出黑名单吗？',
-    success: async (res) => {
+    success: async (res: any) => {
       if (res.confirm) {
         try {
           // 这里应该调用移除黑名单的API
@@ -181,7 +197,7 @@ const removeFromBlacklist = async (id) => {
 }
 
 // 格式化日期时间
-const formatDateTime = (dateString) => {
+const formatDateTime = (dateString: string): string => {
   if (!dateString) return ''
   const date = new Date(dateString)
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`

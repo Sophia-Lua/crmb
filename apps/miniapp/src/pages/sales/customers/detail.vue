@@ -123,25 +123,42 @@
   </view>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useSalesStore } from '../../stores/sales'
 
+interface Customer {
+  id: string
+  customerName: string
+  customerType: string
+  storeType: string
+  address: string
+  contactName: string
+  contactPhone: string
+  area?: number
+  businessHours?: string
+  mainCategories?: string[]
+  grade?: string
+  lastVisitDate?: string
+  totalOrderAmount?: number
+  assignedTo?: string
+}
+
 const salesStore = useSalesStore()
-const customer = ref(null)
-const loading = ref(false)
+const customer = ref<Customer | null>(null)
+const loading = ref<boolean>(false)
 
 // 获取客户ID
-onLoad(async (options) => {
-  const id = options.id
+onLoad(async (options: any) => {
+  const id: string = options.id
   if (id) {
     await fetchCustomerDetail(id)
   }
 })
 
 // 获取客户详情
-const fetchCustomerDetail = async (id) => {
+const fetchCustomerDetail = async (id: string): Promise<void> => {
   loading.value = true
   try {
     const response = await salesStore.fetchCustomerDetail(id)
@@ -158,15 +175,15 @@ const fetchCustomerDetail = async (id) => {
 }
 
 // 格式化日期
-const formatDate = (dateString) => {
+const formatDate = (dateString: string): string => {
   if (!dateString) return ''
   const date = new Date(dateString)
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
 // 获取文本映射
-const getCustomerTypeText = (type) => {
-  const typeMap = {
+const getCustomerTypeText = (type: string): string => {
+  const typeMap: Record<string, string> = {
     public: '公海客户',
     private: '私海客户',
     blacklist: '黑名单客户'
@@ -174,8 +191,8 @@ const getCustomerTypeText = (type) => {
   return typeMap[type] || type
 }
 
-const getStoreTypeText = (type) => {
-  const typeMap = {
+const getStoreTypeText = (type: string): string => {
+  const typeMap: Record<string, string> = {
     supermarket: '超市',
     convenience: '便利店',
     restaurant: '餐厅',
@@ -185,12 +202,12 @@ const getStoreTypeText = (type) => {
 }
 
 // 返回上一页
-const goBack = () => {
+const goBack = (): void => {
   uni.navigateBack()
 }
 
 // 编辑客户
-const editCustomer = () => {
+const editCustomer = (): void => {
   uni.showToast({
     title: '编辑功能开发中',
     icon: 'none'
@@ -198,32 +215,32 @@ const editCustomer = () => {
 }
 
 // 新建拜访
-const createVisit = () => {
+const createVisit = (): void => {
   uni.navigateTo({
-    url: `/pages/sales/visits/create?customerId=${customer.value.id}`
+    url: `/pages/sales/visits/create?customerId=${customer.value!.id}`
   })
 }
 
 // 转移客户
-const transferCustomer = () => {
+const transferCustomer = (): void => {
   uni.showModal({
     title: '转移客户',
     content: '请输入目标销售人员ID或姓名',
     editable: true,
     placeholderText: '请输入销售ID或姓名...',
-    success: async (res) => {
+    success: async (res: any) => {
       if (res.confirm && res.content.trim()) {
         try {
           const data = {
             targetSalesId: res.content.trim()
           }
-          await salesStore.transferCustomerAction(customer.value.id, data)
+          await salesStore.transferCustomerAction(customer.value!.id, data)
           uni.showToast({
             title: '转移成功',
             icon: 'success'
           })
           // 刷新详情
-          fetchCustomerDetail(customer.value.id)
+          fetchCustomerDetail(customer.value!.id)
         } catch (error) {
           console.error('转移客户失败:', error)
           uni.showToast({
@@ -237,14 +254,14 @@ const transferCustomer = () => {
 }
 
 // 归还公海
-const returnToPublic = () => {
+const returnToPublic = (): void => {
   uni.showModal({
     title: '确认归还',
     content: '确定要将此客户归还到公海吗？',
-    success: async (res) => {
+    success: async (res: any) => {
       if (res.confirm) {
         try {
-          await salesStore.returnCustomerAction(customer.value.id)
+          await salesStore.returnCustomerAction(customer.value!.id)
           uni.showToast({
             title: '归还成功',
             icon: 'success'
@@ -266,13 +283,13 @@ const returnToPublic = () => {
 }
 
 // 加入黑名单
-const addToBlacklist = () => {
+const addToBlacklist = (): void => {
   uni.showModal({
     title: '加入黑名单',
     content: '请输入拉黑原因（必填）',
     editable: true,
     placeholderText: '请输入拉黑原因...',
-    success: async (res) => {
+    success: async (res: any) => {
       if (res.confirm && res.content.trim()) {
         try {
           // 这里应该调用黑名单相关的API，暂时使用客户管理API
@@ -293,7 +310,7 @@ const addToBlacklist = () => {
 }
 
 // 一键拨号
-const callCustomer = () => {
+const callCustomer = (): void => {
   if (customer.value && customer.value.contactPhone) {
     uni.makePhoneCall({
       phoneNumber: customer.value.contactPhone
@@ -307,7 +324,7 @@ const callCustomer = () => {
 }
 
 // 导航到店
-const navigateToStore = () => {
+const navigateToStore = (): void => {
   if (customer.value && customer.value.address) {
     uni.openLocation({
       address: customer.value.address,

@@ -104,37 +104,62 @@
   </view>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useSalesStore } from '../../stores/sales'
 
+interface Store {
+  id: string
+  storeName: string
+  storeType: string
+  address: string
+  contactName: string
+  licenses?: any[]
+  status: string
+  createdAt: string
+}
+
+interface StoreStatistics {
+  pending?: number
+  todayReviewed?: number
+  passRate?: string
+}
+
+interface FetchParams {
+  keyword: string
+  storeType?: string
+  region?: string
+  page: number
+  pageSize: number
+}
+
 const salesStore = useSalesStore()
-const loading = ref(false)
-const hasMore = ref(true)
-const currentPage = ref(1)
+const loading = ref<boolean>(false)
+const hasMore = ref<boolean>(true)
+const currentPage = ref<number>(1)
 
 // 筛选条件
-const searchKeyword = ref('')
-const storeType = ref('')
-const region = ref('')
+const searchKeyword = ref<string>('')
+const storeType = ref<string>('')
+const region = ref<string>('')
 
 // 选项配置
-const storeTypeOptions = ['全部', '超市', '便利店', '餐厅', '其他']
-const regionOptions = ['全部', '北京', '上海', '广州', '深圳']
+const storeTypeOptions: string[] = ['全部', '超市', '便利店', '餐厅', '其他']
+const regionOptions: string[] = ['全部', '北京', '上海', '广州', '深圳']
 
 // 计算属性
-const storeTypeText = ref('全部')
-const regionText = ref('全部')
+const storeTypeText = ref<string>('全部')
+const regionText = ref<string>('全部')
 
-const stores = ref([])
-const statistics = ref({})
+const stores = ref<Store[]>([])
+const statistics = ref<StoreStatistics>({})
 
 // 获取待审核店铺
-const fetchStores = async (reset = false) => {
+const fetchStores = async (reset: boolean = false): Promise<void> => {
   loading.value = true
   try {
-    const params = {
+    const params: FetchParams = {
       keyword: searchKeyword.value,
       storeType: storeType.value || undefined,
       region: region.value || undefined,
@@ -164,7 +189,7 @@ const fetchStores = async (reset = false) => {
 }
 
 // 获取统计数据
-const fetchStatistics = async () => {
+const fetchStatistics = async (): Promise<void> => {
   try {
     const response = await salesStore.fetchStoreStatistics()
     statistics.value = response.data || {}
@@ -174,38 +199,38 @@ const fetchStatistics = async () => {
 }
 
 // 筛选条件变更
-const onStoreTypeChange = (e) => {
-  const index = e.detail.value
+const onStoreTypeChange = (e: any): void => {
+  const index: number = e.detail.value
   storeTypeText.value = storeTypeOptions[index]
   storeType.value = index === 0 ? '' : ['supermarket', 'convenience', 'restaurant', 'other'][index - 1]
   handleSearch()
 }
 
-const onRegionChange = (e) => {
-  const index = e.detail.value
+const onRegionChange = (e: any): void => {
+  const index: number = e.detail.value
   regionText.value = regionOptions[index]
   region.value = index === 0 ? '' : regionOptions[index]
   handleSearch()
 }
 
 // 搜索
-const handleSearch = () => {
+const handleSearch = (): void => {
   fetchStores(true)
 }
 
 // 加载更多
-const loadMore = () => {
+const loadMore = (): void => {
   if (!hasMore.value || loading.value) return
   fetchStores()
 }
 
 // 审核店铺
-const reviewStore = async (id, approved) => {
+const reviewStore = async (id: string, approved: boolean): Promise<void> => {
   if (approved) {
     uni.showModal({
       title: '确认通过',
       content: '确定要通过此店铺的审核吗？',
-      success: async (res) => {
+      success: async (res: any) => {
         if (res.confirm) {
           await performReview(id, true, '')
         }
@@ -217,7 +242,7 @@ const reviewStore = async (id, approved) => {
       content: '请输入驳回原因（至少10个字符）',
       editable: true,
       placeholderText: '请输入驳回原因...',
-      success: async (res) => {
+      success: async (res: any) => {
         if (res.confirm && res.content.trim().length >= 10) {
           await performReview(id, false, res.content.trim())
         } else if (res.confirm) {
@@ -231,7 +256,7 @@ const reviewStore = async (id, approved) => {
   }
 }
 
-const performReview = async (id, approved, rejectReason) => {
+const performReview = async (id: string, approved: boolean, rejectReason: string): Promise<void> => {
   try {
     await salesStore.reviewStoreAction(id, {
       approved: approved,
@@ -253,35 +278,35 @@ const performReview = async (id, approved, rejectReason) => {
 }
 
 // 跳转详情
-const gotoStoreDetail = (id) => {
+const gotoStoreDetail = (id: string): void => {
   uni.navigateTo({
     url: `/pages/sales/stores/detail?id=${id}`
   })
 }
 
 // 格式化日期
-const formatDate = (dateString) => {
+const formatDate = (dateString: string): string => {
   if (!dateString) return ''
   const date = new Date(dateString)
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
 // 获取状态文本和样式
-const getStatusText = (status) => {
-  const statusMap = {
+const getStatusText = (status: string): string => {
+  const statusMap: Record<string, string> = {
     pending: '待审核',
     reviewing: '审核中'
   }
   return statusMap[status] || status
 }
 
-const getStatusClass = (status) => {
+const getStatusClass = (status: string): string => {
   return `status-${status}`
 }
 
 // 获取类型文本
-const getStoreTypeText = (type) => {
-  const typeMap = {
+const getStoreTypeText = (type: string): string => {
+  const typeMap: Record<string, string> = {
     supermarket: '超市',
     convenience: '便利店',
     restaurant: '餐厅',

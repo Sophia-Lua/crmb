@@ -83,39 +83,55 @@
   </view>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useSalesStore } from '../../stores/sales'
 
+interface Store {
+  id: string
+  storeName: string
+  storeType: string
+  address: string
+  distance?: number
+}
+
+interface FetchParams {
+  keyword: string
+  storeType?: string
+  region?: string
+  page: number
+  pageSize: number
+}
+
 const salesStore = useSalesStore()
-const loading = ref(false)
-const hasMore = ref(true)
-const currentPage = ref(1)
+const loading = ref<boolean>(false)
+const hasMore = ref<boolean>(true)
+const currentPage = ref<number>(1)
 
 // 视图模式
-const viewMode = ref('list') // list, map
+const viewMode = ref<string>('list') // list, map
 
 // 筛选条件
-const searchKeyword = ref('')
-const storeType = ref('') // supermarket, convenience, restaurant, other
-const region = ref('') // province_city_district
+const searchKeyword = ref<string>('')
+const storeType = ref<string>('') // supermarket, convenience, restaurant, other
+const region = ref<string>('') // province_city_district
 
 // 选项配置
-const storeTypeOptions = ['全部', '超市', '便利店', '餐厅', '其他']
-const regionOptions = ['全部', '北京', '上海', '广州', '深圳']
+const storeTypeOptions: string[] = ['全部', '超市', '便利店', '餐厅', '其他']
+const regionOptions: string[] = ['全部', '北京', '上海', '广州', '深圳']
 
 // 计算属性
-const storeTypeText = ref('全部')
-const regionText = ref('全部')
+const storeTypeText = ref<string>('全部')
+const regionText = ref<string>('全部')
 
-const stores = ref([])
+const stores = ref<Store[]>([])
 
 // 获取待领取店铺
-const fetchStores = async (reset = false) => {
+const fetchStores = async (reset: boolean = false): Promise<void> => {
   loading.value = true
   try {
-    const params = {
+    const params: FetchParams = {
       keyword: searchKeyword.value,
       storeType: storeType.value || undefined,
       region: region.value || undefined,
@@ -145,42 +161,42 @@ const fetchStores = async (reset = false) => {
 }
 
 // 切换视图模式
-const switchView = (mode) => {
+const switchView = (mode: string): void => {
   viewMode.value = mode
 }
 
 // 筛选条件变更
-const onStoreTypeChange = (e) => {
-  const index = e.detail.value
+const onStoreTypeChange = (e: any): void => {
+  const index: number = e.detail.value
   storeTypeText.value = storeTypeOptions[index]
   storeType.value = index === 0 ? '' : ['supermarket', 'convenience', 'restaurant', 'other'][index - 1]
   handleSearch()
 }
 
-const onRegionChange = (e) => {
-  const index = e.detail.value
+const onRegionChange = (e: any): void => {
+  const index: number = e.detail.value
   regionText.value = regionOptions[index]
   region.value = index === 0 ? '' : regionOptions[index]
   handleSearch()
 }
 
 // 搜索
-const handleSearch = () => {
+const handleSearch = (): void => {
   fetchStores(true)
 }
 
 // 加载更多
-const loadMore = () => {
+const loadMore = (): void => {
   if (!hasMore.value || loading.value) return
   fetchStores()
 }
 
 // 领取店铺
-const claimStore = async (id) => {
+const claimStore = async (id: string): Promise<void> => {
   uni.showModal({
     title: '确认领取',
     content: '确定要领取此店铺吗？',
-    success: async (res) => {
+    success: async (res: any) => {
       if (res.confirm) {
         try {
           await salesStore.claimStoreAction(id)
@@ -203,10 +219,21 @@ const claimStore = async (id) => {
 }
 
 // 跳转详情
-const gotoStoreDetail = (id) => {
+const gotoStoreDetail = (id: string): void => {
   uni.navigateTo({
     url: `/pages/sales/stores/detail?id=${id}`
   })
+}
+
+// 获取类型文本
+const getStoreTypeText = (type: string): string => {
+  const typeMap: Record<string, string> = {
+    supermarket: '超市',
+    convenience: '便利店',
+    restaurant: '餐厅',
+    other: '其他'
+  }
+  return typeMap[type] || type
 }
 
 // 页面加载

@@ -81,42 +81,61 @@
   </view>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useSalesStore } from '../../stores/sales'
 
+interface Customer {
+  id: string
+  customerName: string
+  grade?: string
+  address: string
+  lastVisitDate?: string
+  totalOrderAmount?: number
+}
+
+interface FetchParams {
+  keyword: string
+  followStatus?: string
+  grade?: string
+  lastVisit?: string
+  sortBy: string
+  page: number
+  pageSize: number
+}
+
 const salesStore = useSalesStore()
-const loading = ref(false)
-const hasMore = ref(true)
-const currentPage = ref(1)
+const loading = ref<boolean>(false)
+const hasMore = ref<boolean>(true)
+const currentPage = ref<number>(1)
 
 // 筛选条件
-const searchKeyword = ref('')
-const followStatus = ref('') // all, visited, not_visited
-const grade = ref('') // A, B, C, D
-const lastVisit = ref('') // today, week, month, all
-const sortBy = ref('last_visit_desc') // last_visit_desc, last_visit_asc, grade_desc, grade_asc, order_amount_desc, order_amount_asc
+const searchKeyword = ref<string>('')
+const followStatus = ref<string>('') // all, visited, not_visited
+const grade = ref<string>('') // A, B, C, D
+const lastVisit = ref<string>('') // today, week, month, all
+const sortBy = ref<string>('last_visit_desc') // last_visit_desc, last_visit_asc, grade_desc, grade_asc, order_amount_desc, order_amount_asc
 
 // 选项配置
-const followStatusOptions = ['全部', '已拜访', '未拜访']
-const gradeOptions = ['全部', 'A级', 'B级', 'C级', 'D级']
-const lastVisitOptions = ['全部', '今天', '本周', '本月']
-const sortByOptions = ['最后拜访时间', '客户等级', '订单金额']
+const followStatusOptions: string[] = ['全部', '已拜访', '未拜访']
+const gradeOptions: string[] = ['全部', 'A级', 'B级', 'C级', 'D级']
+const lastVisitOptions: string[] = ['全部', '今天', '本周', '本月']
+const sortByOptions: string[] = ['最后拜访时间', '客户等级', '订单金额']
 
 // 计算属性
-const followStatusText = ref('全部')
-const gradeText = ref('全部')
-const lastVisitText = ref('全部')
-const sortByText = ref('最后拜访时间')
+const followStatusText = ref<string>('全部')
+const gradeText = ref<string>('全部')
+const lastVisitText = ref<string>('全部')
+const sortByText = ref<string>('最后拜访时间')
 
-const customers = ref([])
+const customers = ref<Customer[]>([])
 
 // 获取私海客户
-const fetchCustomers = async (reset = false) => {
+const fetchCustomers = async (reset: boolean = false): Promise<void> => {
   loading.value = true
   try {
-    const params = {
+    const params: FetchParams = {
       keyword: searchKeyword.value,
       followStatus: followStatus.value || undefined,
       grade: grade.value || undefined,
@@ -148,61 +167,61 @@ const fetchCustomers = async (reset = false) => {
 }
 
 // 格式化日期
-const formatDate = (dateString) => {
+const formatDate = (dateString: string): string => {
   if (!dateString) return ''
   const date = new Date(dateString)
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
 // 筛选条件变更
-const onFollowStatusChange = (e) => {
-  const index = e.detail.value
+const onFollowStatusChange = (e: any): void => {
+  const index: number = e.detail.value
   followStatusText.value = followStatusOptions[index]
   followStatus.value = index === 0 ? '' : ['all', 'visited', 'not_visited'][index]
   handleSearch()
 }
 
-const onGradeChange = (e) => {
-  const index = e.detail.value
+const onGradeChange = (e: any): void => {
+  const index: number = e.detail.value
   gradeText.value = gradeOptions[index]
   grade.value = index === 0 ? '' : ['A', 'B', 'C', 'D'][index - 1]
   handleSearch()
 }
 
-const onLastVisitChange = (e) => {
-  const index = e.detail.value
+const onLastVisitChange = (e: any): void => {
+  const index: number = e.detail.value
   lastVisitText.value = lastVisitOptions[index]
   lastVisit.value = index === 0 ? '' : ['all', 'today', 'week', 'month'][index]
   handleSearch()
 }
 
-const onSortByChange = (e) => {
-  const index = e.detail.value
+const onSortByChange = (e: any): void => {
+  const index: number = e.detail.value
   sortByText.value = sortByOptions[index]
   sortBy.value = ['last_visit_desc', 'grade_desc', 'order_amount_desc'][index]
   handleSearch()
 }
 
 // 搜索
-const handleSearch = () => {
+const handleSearch = (): void => {
   fetchCustomers(true)
 }
 
 // 加载更多
-const loadMore = () => {
+const loadMore = (): void => {
   if (!hasMore.value || loading.value) return
   fetchCustomers()
 }
 
 // 新建拜访
-const createVisit = (customerId) => {
+const createVisit = (customerId: string): void => {
   uni.navigateTo({
     url: `/pages/sales/visits/create?customerId=${customerId}`
   })
 }
 
 // 跳转详情
-const gotoCustomerDetail = (id) => {
+const gotoCustomerDetail = (id: string): void => {
   uni.navigateTo({
     url: `/pages/sales/customers/detail?id=${id}`
   })

@@ -145,25 +145,49 @@
   </view>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref, watch } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useSalesStore } from '../../stores/sales'
 
+interface VisitImage {
+  id: string
+  url: string
+  name: string
+}
+
+interface Visit {
+  id: string
+  customerName: string
+  customerType: string
+  visitType: string
+  visitMethod: string
+  planDate: string
+  planTime?: string
+  subject: string
+  content?: string
+  feedback?: string
+  followUpPlan?: string
+  images?: VisitImage[]
+  status: string
+  createdBy: string
+  createdAt: string
+}
+
 const salesStore = useSalesStore()
-const visit = ref(null)
-const loading = ref(false)
+const visit = ref<Visit | null>(null)
+const loading = ref<boolean>(false)
 
 // 获取拜访ID
-onLoad(async (options) => {
-  const id = options.id
+onLoad(async (options: any) => {
+  const id: string = options.id
   if (id) {
     await fetchVisitDetail(id)
   }
 })
 
 // 获取拜访详情
-const fetchVisitDetail = async (id) => {
+const fetchVisitDetail = async (id: string): Promise<void> => {
   loading.value = true
   try {
     const response = await salesStore.fetchVisitDetail(id)
@@ -180,11 +204,11 @@ const fetchVisitDetail = async (id) => {
 }
 
 // 计算属性
-const canEdit = ref(false)
-const canOperate = ref(false)
+const canEdit = ref<boolean>(false)
+const canOperate = ref<boolean>(false)
 
 // 监听数据变化更新权限
-watch(() => visit.value, (newVisit) => {
+watch(() => visit.value, (newVisit: Visit | null) => {
   if (newVisit) {
     // 草稿和待拜访状态可以编辑
     canEdit.value = ['draft', 'pending'].includes(newVisit.status)
@@ -194,29 +218,29 @@ watch(() => visit.value, (newVisit) => {
 }, { immediate: true })
 
 // 格式化日期时间
-const formatDate = (dateString) => {
+const formatDate = (dateString: string): string => {
   if (!dateString) return ''
   const date = new Date(dateString)
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
-const formatDateTime = (dateString) => {
+const formatDateTime = (dateString: string): string => {
   if (!dateString) return ''
   const date = new Date(dateString)
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
 }
 
 // 获取文本映射
-const getCustomerTypeText = (type) => {
-  const typeMap = {
+const getCustomerTypeText = (type: string): string => {
+  const typeMap: Record<string, string> = {
     public: '公海客户',
     private: '私海客户'
   }
   return typeMap[type] || type
 }
 
-const getVisitTypeText = (type) => {
-  const typeMap = {
+const getVisitTypeText = (type: string): string => {
+  const typeMap: Record<string, string> = {
     first: '首次拜访',
     regular: '定期回访',
     temporary: '临时拜访',
@@ -225,8 +249,8 @@ const getVisitTypeText = (type) => {
   return typeMap[type] || type
 }
 
-const getVisitMethodText = (method) => {
-  const methodMap = {
+const getVisitMethodText = (method: string): string => {
+  const methodMap: Record<string, string> = {
     onsite: '实地拜访',
     phone: '电话拜访',
     video: '视频拜访',
@@ -235,8 +259,8 @@ const getVisitMethodText = (method) => {
   return methodMap[method] || method
 }
 
-const getStatusText = (status) => {
-  const statusMap = {
+const getStatusText = (status: string): string => {
+  const statusMap: Record<string, string> = {
     draft: '草稿',
     pending: '待拜访',
     in_progress: '进行中',
@@ -246,53 +270,53 @@ const getStatusText = (status) => {
   return statusMap[status] || status
 }
 
-const getStatusClass = (status) => {
+const getStatusClass = (status: string): string => {
   return `status-${status}`
 }
 
 // 返回上一页
-const goBack = () => {
+const goBack = (): void => {
   uni.navigateBack()
 }
 
 // 跳转编辑
-const gotoEdit = () => {
+const gotoEdit = (): void => {
   uni.navigateTo({
-    url: `/pages/sales/visits/edit?id=${visit.value.id}`
+    url: `/pages/sales/visits/edit?id=${visit.value!.id}`
   })
 }
 
 // 预览图片
-const previewImage = (url) => {
+const previewImage = (url: string): void => {
   uni.previewImage({
     urls: [url]
   })
 }
 
 // 更新状态
-const updateStatus = async (newStatus) => {
-  const actionMap = {
+const updateStatus = async (newStatus: string): Promise<void> => {
+  const actionMap: Record<string, string> = {
     draft: '提交',
     pending: '开始',
     in_progress: '完成',
     cancelled: '取消'
   }
   
-  const actionText = actionMap[newStatus] || '更新'
+  const actionText: string = actionMap[newStatus] || '更新'
   
   uni.showModal({
     title: `确认${actionText}`,
     content: `确定要${actionText}此次拜访吗？`,
-    success: async (res) => {
+    success: async (res: any) => {
       if (res.confirm) {
         try {
-          await salesStore.updateVisitRecord(visit.value.id, { status: newStatus })
+          await salesStore.updateVisitRecord(visit.value!.id, { status: newStatus })
           uni.showToast({
             title: `${actionText}成功`,
             icon: 'success'
           })
           // 刷新详情
-          fetchVisitDetail(visit.value.id)
+          fetchVisitDetail(visit.value!.id)
         } catch (error) {
           console.error(`${actionText}拜访失败:`, error)
           uni.showToast({
@@ -306,23 +330,23 @@ const updateStatus = async (newStatus) => {
 }
 
 // 添加跟进备注
-const addFollowUpNote = () => {
+const addFollowUpNote = (): void => {
   uni.showModal({
     title: '添加跟进备注',
     content: '请输入跟进备注内容',
     editable: true,
     placeholderText: '请输入备注...',
-    success: async (res) => {
+    success: async (res: any) => {
       if (res.confirm && res.content.trim()) {
         try {
-          const newContent = visit.value.content + '\n\n【跟进备注】' + res.content.trim()
-          await salesStore.updateVisitRecord(visit.value.id, { content: newContent })
+          const newContent: string = visit.value!.content + '\n\n【跟进备注】' + res.content.trim()
+          await salesStore.updateVisitRecord(visit.value!.id, { content: newContent })
           uni.showToast({
             title: '备注添加成功',
             icon: 'success'
           })
           // 刷新详情
-          fetchVisitDetail(visit.value.id)
+          fetchVisitDetail(visit.value!.id)
         } catch (error) {
           console.error('添加备注失败:', error)
           uni.showToast({

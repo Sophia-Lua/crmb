@@ -69,16 +69,29 @@
   </view>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useSalesStore } from '../../stores/sales'
 
+interface LayerStatus {
+  public: boolean
+  private: boolean
+  others: boolean
+  unregistered: boolean
+}
+
+interface FetchParams {
+  keyword: string
+  region: string
+  customerType: string
+}
+
 const salesStore = useSalesStore()
-const loading = ref(false)
+const loading = ref<boolean>(false)
 
 // 图层控制
-const layerStatus = ref({
+const layerStatus = ref<LayerStatus>({
   public: true,
   private: true,
   others: false,
@@ -86,52 +99,52 @@ const layerStatus = ref({
 })
 
 // 筛选条件
-const searchKeyword = ref('')
-const region = ref('') // province_city_district
-const customerType = ref('') // supermarket, convenience, restaurant, other
+const searchKeyword = ref<string>('')
+const region = ref<string>('') // province_city_district
+const customerType = ref<string>('') // supermarket, convenience, restaurant, other
 
 // 选项配置
-const regionOptions = ['全部', '北京', '上海', '广州', '深圳']
-const customerTypeOptions = ['全部', '超市', '便利店', '餐厅', '其他']
+const regionOptions: string[] = ['全部', '北京', '上海', '广州', '深圳']
+const customerTypeOptions: string[] = ['全部', '超市', '便利店', '餐厅', '其他']
 
 // 计算属性
-const regionText = ref('全部')
-const customerTypeText = ref('全部')
+const regionText = ref<string>('全部')
+const customerTypeText = ref<string>('全部')
 
 // 客户数量
-const publicCount = ref(0)
-const privateCount = ref(0)
-const othersCount = ref(0)
-const unregisteredCount = ref(0)
+const publicCount = ref<number>(0)
+const privateCount = ref<number>(0)
+const othersCount = ref<number>(0)
+const unregisteredCount = ref<number>(0)
 
 // 切换图层
-const toggleLayer = (layer) => {
+const toggleLayer = (layer: keyof LayerStatus): void => {
   layerStatus.value[layer] = !layerStatus.value[layer]
   fetchMapData()
 }
 
 // 筛选条件变更
-const onRegionChange = (e) => {
-  const index = e.detail.value
+const onRegionChange = (e: any): void => {
+  const index: number = e.detail.value
   regionText.value = regionOptions[index]
   region.value = index === 0 ? '' : regionOptions[index]
   handleSearch()
 }
 
-const onCustomerTypeChange = (e) => {
-  const index = e.detail.value
+const onCustomerTypeChange = (e: any): void => {
+  const index: number = e.detail.value
   customerTypeText.value = customerTypeOptions[index]
   customerType.value = index === 0 ? '' : ['supermarket', 'convenience', 'restaurant', 'other'][index - 1]
   handleSearch()
 }
 
 // 搜索
-const handleSearch = () => {
+const handleSearch = (): void => {
   fetchMapData()
 }
 
 // 获取地图数据
-const fetchMapData = async () => {
+const fetchMapData = async (): Promise<void> => {
   loading.value = true
   try {
     // 获取公海客户
@@ -238,19 +251,19 @@ onLoad(() => {
 }
 
 .public-color {
-  background-color: #1890ff; /* 蓝色 */
+  background-color: #1890ff;
 }
 
 .private-color {
-  background-color: #52c41a; /* 绿色 */
+  background-color: #52c41a;
 }
 
 .others-color {
-  background-color: #faad14; /* 黄色 */
+  background-color: #faad14;
 }
 
 .unregistered-color {
-  background-color: #999999; /* 灰色 */
+  background-color: #999999;
 }
 
 .layer-text {

@@ -98,37 +98,62 @@
   </view>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useSalesStore } from '../../stores/sales'
 
+interface Visit {
+  id: string
+  customerName: string
+  status: string
+  visitType: string
+  visitMethod: string
+  planDate: string
+  planTime?: string
+  subject: string
+}
+
+interface VisitStatistics {
+  today?: number
+  week?: number
+  month?: number
+}
+
+interface FetchParams {
+  keyword: string
+  visitType?: string
+  visitMethod?: string
+  page: number
+  pageSize: number
+}
+
 const salesStore = useSalesStore()
-const loading = ref(false)
-const hasMore = ref(true)
-const currentPage = ref(1)
+const loading = ref<boolean>(false)
+const hasMore = ref<boolean>(true)
+const currentPage = ref<number>(1)
 
 // 筛选条件
-const searchKeyword = ref('')
-const visitType = ref('') // first, regular, temporary, other
-const visitMethod = ref('') // onsite, phone, video, wechat
+const searchKeyword = ref<string>('')
+const visitType = ref<string>('') // first, regular, temporary, other
+const visitMethod = ref<string>('') // onsite, phone, video, wechat
 
 // 选项配置
-const visitTypeOptions = ['全部', '首次拜访', '定期回访', '临时拜访', '其他']
-const visitMethodOptions = ['全部', '实地拜访', '电话拜访', '视频拜访', '微信拜访']
+const visitTypeOptions: string[] = ['全部', '首次拜访', '定期回访', '临时拜访', '其他']
+const visitMethodOptions: string[] = ['全部', '实地拜访', '电话拜访', '视频拜访', '微信拜访']
 
 // 计算属性
-const visitTypeText = ref('全部')
-const visitMethodText = ref('全部')
+const visitTypeText = ref<string>('全部')
+const visitMethodText = ref<string>('全部')
 
-const visits = ref([])
-const statistics = ref({})
+const visits = ref<Visit[]>([])
+const statistics = ref<VisitStatistics>({})
 
 // 获取拜访列表
-const fetchVisits = async (reset = false) => {
+const fetchVisits = async (reset: boolean = false): Promise<void> => {
   loading.value = true
   try {
-    const params = {
+    const params: FetchParams = {
       keyword: searchKeyword.value,
       visitType: visitType.value || undefined,
       visitMethod: visitMethod.value || undefined,
@@ -158,7 +183,7 @@ const fetchVisits = async (reset = false) => {
 }
 
 // 获取统计数据
-const fetchStatistics = async () => {
+const fetchStatistics = async (): Promise<void> => {
   try {
     const response = await salesStore.fetchVisitStatistics()
     statistics.value = response.data || {}
@@ -168,15 +193,15 @@ const fetchStatistics = async () => {
 }
 
 // 格式化日期
-const formatDate = (dateString) => {
+const formatDate = (dateString: string): string => {
   if (!dateString) return ''
   const date = new Date(dateString)
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
 // 获取状态文本和样式
-const getStatusText = (status) => {
-  const statusMap = {
+const getStatusText = (status: string): string => {
+  const statusMap: Record<string, string> = {
     draft: '草稿',
     pending: '待拜访',
     in_progress: '进行中',
@@ -186,13 +211,13 @@ const getStatusText = (status) => {
   return statusMap[status] || status
 }
 
-const getStatusClass = (status) => {
+const getStatusClass = (status: string): string => {
   return `status-${status}`
 }
 
 // 获取类型和方式文本
-const getVisitTypeText = (type) => {
-  const typeMap = {
+const getVisitTypeText = (type: string): string => {
+  const typeMap: Record<string, string> = {
     first: '首次拜访',
     regular: '定期回访',
     temporary: '临时拜访',
@@ -201,8 +226,8 @@ const getVisitTypeText = (type) => {
   return typeMap[type] || type
 }
 
-const getVisitMethodText = (method) => {
-  const methodMap = {
+const getVisitMethodText = (method: string): string => {
+  const methodMap: Record<string, string> = {
     onsite: '实地拜访',
     phone: '电话拜访',
     video: '视频拜访',
@@ -212,39 +237,39 @@ const getVisitMethodText = (method) => {
 }
 
 // 筛选条件变更
-const onVisitTypeChange = (e) => {
-  const index = e.detail.value
+const onVisitTypeChange = (e: any): void => {
+  const index: number = e.detail.value
   visitTypeText.value = visitTypeOptions[index]
   visitType.value = index === 0 ? '' : ['first', 'regular', 'temporary', 'other'][index - 1]
   handleSearch()
 }
 
-const onVisitMethodChange = (e) => {
-  const index = e.detail.value
+const onVisitMethodChange = (e: any): void => {
+  const index: number = e.detail.value
   visitMethodText.value = visitMethodOptions[index]
   visitMethod.value = index === 0 ? '' : ['onsite', 'phone', 'video', 'wechat'][index - 1]
   handleSearch()
 }
 
 // 搜索
-const handleSearch = () => {
+const handleSearch = (): void => {
   fetchVisits(true)
 }
 
 // 加载更多
-const loadMore = () => {
+const loadMore = (): void => {
   if (!hasMore.value || loading.value) return
   fetchVisits()
 }
 
 // 跳转页面
-const gotoCreate = () => {
+const gotoCreate = (): void => {
   uni.navigateTo({
     url: '/pages/sales/visits/create'
   })
 }
 
-const gotoDetail = (id) => {
+const gotoDetail = (id: string): void => {
   uni.navigateTo({
     url: `/pages/sales/visits/detail?id=${id}`
   })

@@ -137,15 +137,31 @@
   </view>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useSalesStore } from '../../stores/sales'
 
+interface Customer {
+  id: string
+  customerName: string
+}
+
+interface FormData {
+  customerId: string
+  customerName: string
+  visitType: string
+  visitMethod: string
+  subject: string
+  content: string
+  feedback: string
+  followUpPlan: string
+}
+
 const salesStore = useSalesStore()
 
 // 表单数据
-const formData = ref({
+const formData = ref<FormData>({
   customerId: '',
   customerName: '',
   visitType: 'first',
@@ -157,28 +173,28 @@ const formData = ref({
 })
 
 // 选项配置
-const visitTypeOptions = ['首次拜访', '定期回访', '临时拜访', '其他']
-const visitMethodOptions = ['实地拜访', '电话拜访', '视频拜访', '微信拜访']
-const visitTypeIndex = ref(0)
-const visitMethodIndex = ref(0)
+const visitTypeOptions: string[] = ['首次拜访', '定期回访', '临时拜访', '其他']
+const visitMethodOptions: string[] = ['实地拜访', '电话拜访', '视频拜访', '微信拜访']
+const visitTypeIndex = ref<number>(0)
+const visitMethodIndex = ref<number>(0)
 
 // 客户选择
-const customerList = ref([])
-const selectedCustomer = ref(null)
-const selectedCustomerIndex = ref(-1)
+const customerList = ref<Customer[]>([])
+const selectedCustomer = ref<Customer | null>(null)
+const selectedCustomerIndex = ref<number>(-1)
 
 // 图片列表
-const imageList = ref([])
+const imageList = ref<string[]>([])
 
 // 是否可提交
-const canSubmit = computed(() => {
-  return formData.value.customerId && 
-         formData.value.subject.trim() && 
-         formData.value.content.trim()
+const canSubmit = computed<boolean>(() => {
+  return !!formData.value.customerId && 
+         !!formData.value.subject.trim() && 
+         !!formData.value.content.trim()
 })
 
 // 页面加载
-onLoad(async (options) => {
+onLoad(async (options: any) => {
   // 如果传入了customerId，预选客户
   if (options.customerId) {
     formData.value.customerId = options.customerId
@@ -196,8 +212,8 @@ onLoad(async (options) => {
 })
 
 // 客户选择变更
-const onCustomerChange = (e) => {
-  const index = e.detail.value
+const onCustomerChange = (e: any): void => {
+  const index: number = e.detail.value
   selectedCustomerIndex.value = index
   selectedCustomer.value = customerList.value[index]
   formData.value.customerId = selectedCustomer.value.id
@@ -205,37 +221,37 @@ const onCustomerChange = (e) => {
 }
 
 // 拜访类型变更
-const onVisitTypeChange = (e) => {
+const onVisitTypeChange = (e: any): void => {
   visitTypeIndex.value = e.detail.value
   formData.value.visitType = ['first', 'regular', 'temporary', 'other'][visitTypeIndex.value]
 }
 
 // 拜访方式变更
-const onVisitMethodChange = (e) => {
+const onVisitMethodChange = (e: any): void => {
   visitMethodIndex.value = e.detail.value
   formData.value.visitMethod = ['onsite', 'phone', 'video', 'wechat'][visitMethodIndex.value]
 }
 
 // 选择图片
-const chooseImage = () => {
-  const remaining = 9 - imageList.value.length
+const chooseImage = (): void => {
+  const remaining: number = 9 - imageList.value.length
   uni.chooseImage({
     count: remaining,
     sizeType: ['compressed'],
     sourceType: ['album', 'camera'],
-    success: (res) => {
+    success: (res: any) => {
       imageList.value = [...imageList.value, ...res.tempFilePaths]
     }
   })
 }
 
 // 删除图片
-const removeImage = (index) => {
+const removeImage = (index: number): void => {
   imageList.value.splice(index, 1)
 }
 
 // 预览图片
-const previewImage = (index) => {
+const previewImage = (index: number): void => {
   uni.previewImage({
     current: imageList.value[index],
     urls: imageList.value
@@ -243,12 +259,12 @@ const previewImage = (index) => {
 }
 
 // 返回
-const goBack = () => {
+const goBack = (): void => {
   uni.navigateBack()
 }
 
 // 保存草稿
-const saveDraft = async () => {
+const saveDraft = async (): Promise<void> => {
   try {
     await salesStore.createNewVisit({
       ...formData.value,
@@ -272,7 +288,7 @@ const saveDraft = async () => {
 }
 
 // 提交拜访
-const submitVisit = async () => {
+const submitVisit = async (): Promise<void> => {
   if (!canSubmit.value) {
     uni.showToast({
       title: '请填写必填项',

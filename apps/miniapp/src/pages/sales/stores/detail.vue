@@ -105,25 +105,44 @@
   </view>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref, watch } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useSalesStore } from '../../stores/sales'
 
+interface StoreLicense {
+  id: string
+  url: string
+  type: string
+}
+
+interface Store {
+  id: string
+  storeName: string
+  storeType: string
+  address: string
+  contactName: string
+  contactPhone: string
+  area?: number
+  licenses?: StoreLicense[]
+  status: string
+  rejectReason?: string
+}
+
 const salesStore = useSalesStore()
-const store = ref(null)
-const loading = ref(false)
+const store = ref<Store | null>(null)
+const loading = ref<boolean>(false)
 
 // 获取店铺ID
-onLoad(async (options) => {
-  const id = options.id
+onLoad(async (options: any) => {
+  const id: string = options.id
   if (id) {
     await fetchStoreDetail(id)
   }
 })
 
 // 获取店铺详情
-const fetchStoreDetail = async (id) => {
+const fetchStoreDetail = async (id: string): Promise<void> => {
   loading.value = true
   try {
     const response = await salesStore.fetchStoreDetail(id)
@@ -140,10 +159,10 @@ const fetchStoreDetail = async (id) => {
 }
 
 // 计算属性
-const canOperate = ref(false)
+const canOperate = ref<boolean>(false)
 
 // 监听数据变化更新权限
-watch(() => store.value, (newStore) => {
+watch(() => store.value, (newStore: Store | null) => {
   if (newStore) {
     // 根据状态判断可操作性
     canOperate.value = ['unclaimed', 'pending', 'approved'].includes(newStore.status)
@@ -151,8 +170,8 @@ watch(() => store.value, (newStore) => {
 }, { immediate: true })
 
 // 获取文本映射
-const getStoreTypeText = (type) => {
-  const typeMap = {
+const getStoreTypeText = (type: string): string => {
+  const typeMap: Record<string, string> = {
     supermarket: '超市',
     convenience: '便利店',
     restaurant: '餐厅',
@@ -161,8 +180,8 @@ const getStoreTypeText = (type) => {
   return typeMap[type] || type
 }
 
-const getStatusText = (status) => {
-  const statusMap = {
+const getStatusText = (status: string): string => {
+  const statusMap: Record<string, string> = {
     unclaimed: '待领取',
     pending: '待审核',
     reviewing: '审核中',
@@ -172,8 +191,8 @@ const getStatusText = (status) => {
   return statusMap[status] || status
 }
 
-const getStatusClass = (status) => {
-  const classMap = {
+const getStatusClass = (status: string): string => {
+  const classMap: Record<string, string> = {
     unclaimed: 'status-pending',
     pending: 'status-warning',
     reviewing: 'status-processing',
@@ -184,32 +203,32 @@ const getStatusClass = (status) => {
 }
 
 // 返回上一页
-const goBack = () => {
+const goBack = (): void => {
   uni.navigateBack()
 }
 
 // 预览图片
-const previewImage = (url) => {
+const previewImage = (url: string): void => {
   uni.previewImage({
     urls: [url]
   })
 }
 
 // 领取店铺
-const claimStore = async () => {
+const claimStore = async (): Promise<void> => {
   uni.showModal({
     title: '确认领取',
     content: '确定要领取此店铺吗？',
-    success: async (res) => {
+    success: async (res: any) => {
       if (res.confirm) {
         try {
-          await salesStore.claimStoreAction(store.value.id)
+          await salesStore.claimStoreAction(store.value!.id)
           uni.showToast({
             title: '领取成功',
             icon: 'success'
           })
           // 刷新详情
-          fetchStoreDetail(store.value.id)
+          fetchStoreDetail(store.value!.id)
         } catch (error) {
           console.error('领取店铺失败:', error)
           uni.showToast({
@@ -223,18 +242,16 @@ const claimStore = async () => {
 }
 
 // 审核店铺
-const reviewStore = async (approved) => {
-  let content = ''
+const reviewStore = async (approved: boolean): Promise<void> => {
   if (!approved) {
     uni.showModal({
       title: '输入驳回原因',
       content: '请输入驳回原因（至少10个字符）',
       editable: true,
       placeholderText: '请输入驳回原因...',
-      success: async (res) => {
+      success: async (res: any) => {
         if (res.confirm && res.content.trim().length >= 10) {
-          content = res.content.trim()
-          await performReview(approved, content)
+          await performReview(false, res.content.trim())
         } else if (res.confirm) {
           uni.showToast({
             title: '驳回原因至少10个字符',
@@ -244,23 +261,23 @@ const reviewStore = async (approved) => {
       }
     })
   } else {
-    await performReview(approved, '')
+    await performReview(true, '')
   }
 }
 
-const performReview = async (approved, rejectReason) => {
+const performReview = async (approved: boolean, rejectReason: string): Promise<void> => {
   try {
     const data = {
       approved: approved,
       rejectReason: rejectReason || undefined
     }
-    await salesStore.reviewStoreAction(store.value.id, data)
+    await salesStore.reviewStoreAction(store.value!.id, data)
     uni.showToast({
       title: approved ? '审核通过' : '驳回成功',
       icon: 'success'
     })
     // 刷新详情
-    fetchStoreDetail(store.value.id)
+    fetchStoreDetail(store.value!.id)
   } catch (error) {
     console.error('审核店铺失败:', error)
     uni.showToast({
@@ -271,25 +288,25 @@ const performReview = async (approved, rejectReason) => {
 }
 
 // 分配店铺
-const assignStore = () => {
+const assignStore = (): void => {
   uni.showModal({
     title: '分配销售',
     content: '请输入销售人员ID或姓名',
     editable: true,
     placeholderText: '请输入销售ID或姓名...',
-    success: async (res) => {
+    success: async (res: any) => {
       if (res.confirm && res.content.trim()) {
         try {
           const data = {
             salesId: res.content.trim()
           }
-          await salesStore.assignStoreAction(store.value.id, data)
+          await salesStore.assignStoreAction(store.value!.id, data)
           uni.showToast({
             title: '分配成功',
             icon: 'success'
           })
           // 刷新详情
-          fetchStoreDetail(store.value.id)
+          fetchStoreDetail(store.value!.id)
         } catch (error) {
           console.error('分配店铺失败:', error)
           uni.showToast({

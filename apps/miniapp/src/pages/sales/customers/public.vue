@@ -75,39 +75,57 @@
   </view>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useSalesStore } from '../../stores/sales'
 
+interface Customer {
+  id: string
+  customerName: string
+  customerType: string
+  address: string
+  area?: number
+  contactPhone?: string
+}
+
+interface FetchParams {
+  keyword: string
+  region?: string
+  storeType?: string
+  sortBy: string
+  page: number
+  pageSize: number
+}
+
 const salesStore = useSalesStore()
-const loading = ref(false)
-const hasMore = ref(true)
-const currentPage = ref(1)
+const loading = ref<boolean>(false)
+const hasMore = ref<boolean>(true)
+const currentPage = ref<number>(1)
 
 // 筛选条件
-const searchKeyword = ref('')
-const region = ref('') // province_city_district
-const storeType = ref('') // supermarket, convenience, restaurant, other
-const sortBy = ref('register_time_desc') // register_time_desc, register_time_asc, distance_asc, distance_desc, area_desc, area_asc
+const searchKeyword = ref<string>('')
+const region = ref<string>('') // province_city_district
+const storeType = ref<string>('') // supermarket, convenience, restaurant, other
+const sortBy = ref<string>('register_time_desc') // register_time_desc, register_time_asc, distance_asc, distance_desc, area_desc, area_asc
 
 // 选项配置
-const regionOptions = ['全部', '北京', '上海', '广州', '深圳']
-const storeTypeOptions = ['全部', '超市', '便利店', '餐厅', '其他']
-const sortByOptions = ['注册时间（最新）', '注册时间（最早）', '距离（最近）', '距离（最远）', '面积（大）', '面积（小）']
+const regionOptions: string[] = ['全部', '北京', '上海', '广州', '深圳']
+const storeTypeOptions: string[] = ['全部', '超市', '便利店', '餐厅', '其他']
+const sortByOptions: string[] = ['注册时间（最新）', '注册时间（最早）', '距离（最近）', '距离（最远）', '面积（大）', '面积（小）']
 
 // 计算属性
-const regionText = ref('全部')
-const storeTypeText = ref('全部')
-const sortByText = ref('注册时间（最新）')
+const regionText = ref<string>('全部')
+const storeTypeText = ref<string>('全部')
+const sortByText = ref<string>('注册时间（最新）')
 
-const customers = ref([])
+const customers = ref<Customer[]>([])
 
 // 获取公海客户
-const fetchCustomers = async (reset = false) => {
+const fetchCustomers = async (reset: boolean = false): Promise<void> => {
   loading.value = true
   try {
-    const params = {
+    const params: FetchParams = {
       keyword: searchKeyword.value,
       region: region.value || undefined,
       storeType: storeType.value || undefined,
@@ -138,44 +156,44 @@ const fetchCustomers = async (reset = false) => {
 }
 
 // 筛选条件变更
-const onRegionChange = (e) => {
-  const index = e.detail.value
+const onRegionChange = (e: any): void => {
+  const index: number = e.detail.value
   regionText.value = regionOptions[index]
   region.value = index === 0 ? '' : regionOptions[index]
   handleSearch()
 }
 
-const onStoreTypeChange = (e) => {
-  const index = e.detail.value
+const onStoreTypeChange = (e: any): void => {
+  const index: number = e.detail.value
   storeTypeText.value = storeTypeOptions[index]
   storeType.value = index === 0 ? '' : ['supermarket', 'convenience', 'restaurant', 'other'][index - 1]
   handleSearch()
 }
 
-const onSortByChange = (e) => {
-  const index = e.detail.value
+const onSortByChange = (e: any): void => {
+  const index: number = e.detail.value
   sortByText.value = sortByOptions[index]
   sortBy.value = ['register_time_desc', 'register_time_asc', 'distance_asc', 'distance_desc', 'area_desc', 'area_asc'][index]
   handleSearch()
 }
 
 // 搜索
-const handleSearch = () => {
+const handleSearch = (): void => {
   fetchCustomers(true)
 }
 
 // 加载更多
-const loadMore = () => {
+const loadMore = (): void => {
   if (!hasMore.value || loading.value) return
   fetchCustomers()
 }
 
 // 领取客户
-const claimCustomer = async (id) => {
+const claimCustomer = async (id: string): Promise<void> => {
   uni.showModal({
     title: '确认领取',
     content: '确定要领取此客户吗？',
-    success: async (res) => {
+    success: async (res: any) => {
       if (res.confirm) {
         try {
           await salesStore.claimCustomerAction(id)
@@ -198,10 +216,20 @@ const claimCustomer = async (id) => {
 }
 
 // 跳转详情
-const gotoCustomerDetail = (id) => {
+const gotoCustomerDetail = (id: string): void => {
   uni.navigateTo({
     url: `/pages/sales/customers/detail?id=${id}`
   })
+}
+
+// 获取客户类型文本
+const getCustomerTypeText = (type: string): string => {
+  const typeMap: Record<string, string> = {
+    public: '公海客户',
+    private: '私海客户',
+    blacklist: '黑名单客户'
+  }
+  return typeMap[type] || type
 }
 
 // 页面加载

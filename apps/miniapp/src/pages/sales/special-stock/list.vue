@@ -82,33 +82,52 @@
   </view>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useSalesStore } from '../../stores/sales'
 
+interface SpecialStockRequest {
+  id: string
+  requestId: string
+  status: string
+  customerName: string
+  productName: string
+  sku: string
+  quantity: number
+  reason?: string
+  createdAt: string
+}
+
+interface FetchParams {
+  keyword: string
+  status?: string
+  page: number
+  pageSize: number
+}
+
 const salesStore = useSalesStore()
-const loading = ref(false)
-const hasMore = ref(true)
-const currentPage = ref(1)
+const loading = ref<boolean>(false)
+const hasMore = ref<boolean>(true)
+const currentPage = ref<number>(1)
 
 // 筛选条件
-const searchKeyword = ref('')
-const status = ref('')
+const searchKeyword = ref<string>('')
+const status = ref<string>('')
 
 // 选项配置
-const statusOptions = ['全部', '待处理', '已批准', '已拒绝', '已完成']
+const statusOptions: string[] = ['全部', '待处理', '已批准', '已拒绝', '已完成']
 
 // 计算属性
-const statusText = ref('全部')
+const statusText = ref<string>('全部')
 
-const requests = ref([])
+const requests = ref<SpecialStockRequest[]>([])
 
 // 获取特殊备货需求列表
-const fetchRequests = async (reset = false) => {
+const fetchRequests = async (reset: boolean = false): Promise<void> => {
   loading.value = true
   try {
-    const params = {
+    const params: FetchParams = {
       keyword: searchKeyword.value,
       status: status.value || undefined,
       page: reset ? 1 : currentPage.value,
@@ -137,41 +156,41 @@ const fetchRequests = async (reset = false) => {
 }
 
 // 筛选条件变更
-const onStatusChange = (e) => {
-  const index = e.detail.value
+const onStatusChange = (e: any): void => {
+  const index: number = e.detail.value
   statusText.value = statusOptions[index]
   status.value = index === 0 ? '' : ['pending', 'approved', 'rejected', 'fulfilled'][index - 1]
   handleSearch()
 }
 
 // 搜索
-const handleSearch = () => {
+const handleSearch = (): void => {
   fetchRequests(true)
 }
 
 // 加载更多
-const loadMore = () => {
+const loadMore = (): void => {
   if (!hasMore.value || loading.value) return
   fetchRequests()
 }
 
 // 跳转详情
-const gotoDetail = (id) => {
+const gotoDetail = (id: string): void => {
   uni.navigateTo({
     url: `/pages/sales/special-stock/detail?id=${id}`
   })
 }
 
 // 格式化日期
-const formatDate = (dateString) => {
+const formatDate = (dateString: string): string => {
   if (!dateString) return ''
   const date = new Date(dateString)
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
 // 获取状态文本和样式
-const getStatusText = (status) => {
-  const statusMap = {
+const getStatusText = (status: string): string => {
+  const statusMap: Record<string, string> = {
     pending: '待处理',
     approved: '已批准',
     rejected: '已拒绝',
@@ -180,7 +199,7 @@ const getStatusText = (status) => {
   return statusMap[status] || status
 }
 
-const getStatusClass = (status) => {
+const getStatusClass = (status: string): string => {
   return `status-${status}`
 }
 

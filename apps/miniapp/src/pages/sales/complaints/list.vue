@@ -89,36 +89,56 @@
   </view>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useSalesStore } from '../../stores/sales'
 
+interface Complaint {
+  id: string
+  complaintNo: string
+  status: string
+  customerName: string
+  type: string
+  priority: string
+  content: string
+  createdAt: string
+  satisfaction?: number
+}
+
+interface FetchParams {
+  keyword: string
+  status?: string
+  type?: string
+  page: number
+  pageSize: number
+}
+
 const salesStore = useSalesStore()
-const loading = ref(false)
-const hasMore = ref(true)
-const currentPage = ref(1)
+const loading = ref<boolean>(false)
+const hasMore = ref<boolean>(true)
+const currentPage = ref<number>(1)
 
 // 筛选条件
-const searchKeyword = ref('')
-const status = ref('')
-const type = ref('')
+const searchKeyword = ref<string>('')
+const status = ref<string>('')
+const type = ref<string>('')
 
 // 选项配置
-const statusOptions = ['全部', '待处理', '已受理', '处理中', '已解决', '已关闭']
-const typeOptions = ['全部', '质量问题', '服务问题', '配送问题', '其他']
+const statusOptions: string[] = ['全部', '待处理', '已受理', '处理中', '已解决', '已关闭']
+const typeOptions: string[] = ['全部', '质量问题', '服务问题', '配送问题', '其他']
 
 // 计算属性
-const statusText = ref('全部')
-const typeText = ref('全部')
+const statusText = ref<string>('全部')
+const typeText = ref<string>('全部')
 
-const complaints = ref([])
+const complaints = ref<Complaint[]>([])
 
 // 获取客诉列表
-const fetchComplaints = async (reset = false) => {
+const fetchComplaints = async (reset: boolean = false): Promise<void> => {
   loading.value = true
   try {
-    const params = {
+    const params: FetchParams = {
       keyword: searchKeyword.value,
       status: status.value || undefined,
       type: type.value || undefined,
@@ -148,48 +168,48 @@ const fetchComplaints = async (reset = false) => {
 }
 
 // 筛选条件变更
-const onStatusChange = (e) => {
-  const index = e.detail.value
+const onStatusChange = (e: any): void => {
+  const index: number = e.detail.value
   statusText.value = statusOptions[index]
   status.value = index === 0 ? '' : ['pending', 'accepted', 'processing', 'resolved', 'closed'][index - 1]
   handleSearch()
 }
 
-const onTypeChange = (e) => {
-  const index = e.detail.value
+const onTypeChange = (e: any): void => {
+  const index: number = e.detail.value
   typeText.value = typeOptions[index]
   type.value = index === 0 ? '' : ['quality', 'service', 'delivery', 'other'][index - 1]
   handleSearch()
 }
 
 // 搜索
-const handleSearch = () => {
+const handleSearch = (): void => {
   fetchComplaints(true)
 }
 
 // 加载更多
-const loadMore = () => {
+const loadMore = (): void => {
   if (!hasMore.value || loading.value) return
   fetchComplaints()
 }
 
 // 跳转详情
-const gotoDetail = (id) => {
+const gotoDetail = (id: string): void => {
   uni.navigateTo({
     url: `/pages/sales/complaints/detail?id=${id}`
   })
 }
 
 // 格式化日期
-const formatDate = (dateString) => {
+const formatDate = (dateString: string): string => {
   if (!dateString) return ''
   const date = new Date(dateString)
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
 // 获取状态文本和样式
-const getStatusText = (status) => {
-  const statusMap = {
+const getStatusText = (status: string): string => {
+  const statusMap: Record<string, string> = {
     pending: '待处理',
     accepted: '已受理',
     processing: '处理中',
@@ -199,13 +219,13 @@ const getStatusText = (status) => {
   return statusMap[status] || status
 }
 
-const getStatusClass = (status) => {
+const getStatusClass = (status: string): string => {
   return `status-${status}`
 }
 
 // 获取类型文本
-const getTypeText = (type) => {
-  const typeMap = {
+const getTypeText = (type: string): string => {
+  const typeMap: Record<string, string> = {
     quality: '质量问题',
     service: '服务问题',
     delivery: '配送问题',
@@ -215,8 +235,8 @@ const getTypeText = (type) => {
 }
 
 // 获取优先级文本和样式
-const getPriorityText = (priority) => {
-  const priorityMap = {
+const getPriorityText = (priority: string): string => {
+  const priorityMap: Record<string, string> = {
     low: '低',
     medium: '中',
     high: '高',
@@ -225,7 +245,7 @@ const getPriorityText = (priority) => {
   return priorityMap[priority] || priority
 }
 
-const getPriorityClass = (priority) => {
+const getPriorityClass = (priority: string): string => {
   return `priority-${priority}`
 }
 
