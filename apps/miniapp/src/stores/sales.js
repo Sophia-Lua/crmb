@@ -35,13 +35,13 @@ export const useSalesStore = defineStore('sales', () => {
   // 店铺管理相关状态
   const unclaimedStores = ref([])
   const reviewStores = ref([])
-  currentStore = ref(null)
-  storeStatistics = ref({})
+  const currentStore = ref(null)
+  const storeStatistics = ref({})
   
   // 客户管理相关状态
   const publicCustomers = ref([])
   const privateCustomers = ref([])
-  currentCustomer = ref(null)
+  const currentCustomer = ref(null)
   
   // 销售地图相关状态
   const mapCustomers = ref([])

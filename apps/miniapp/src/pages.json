@@ -77,6 +77,36 @@
       "style": {
         "navigationBarTitleText": "销售地图"
       }
+    },
+    {
+      "path": "pages/sales/visits/create",
+      "style": {
+        "navigationBarTitleText": "新建拜访"
+      }
+    },
+    {
+      "path": "pages/sales/stores/review",
+      "style": {
+        "navigationBarTitleText": "待审核店铺"
+      }
+    },
+    {
+      "path": "pages/sales/complaints/list",
+      "style": {
+        "navigationBarTitleText": "客诉管理"
+      }
+    },
+    {
+      "path": "pages/sales/special-stock/list",
+      "style": {
+        "navigationBarTitleText": "特殊备货需求"
+      }
+    },
+    {
+      "path": "pages/sales/blacklist/list",
+      "style": {
+        "navigationBarTitleText": "黑名单管理"
+      }
     }
   ],
   "globalStyle": {
