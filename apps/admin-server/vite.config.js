@@ -14,13 +14,13 @@ export default defineConfig({
     port: 3000,
     host: '0.0.0.0',
     proxy: {
-      // Proxy API requests to mock server during development
       '/api': {
         target: 'http://localhost:3001',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/api'),
       },
     },
+    allowedHosts: ['.monkeycode-ai.online'],
   },
   build: {
     outDir: 'dist',
