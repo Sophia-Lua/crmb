@@ -60,6 +60,10 @@ func registerSalesRoutes(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		g.POST("/customers/:id/return", handler.ReturnCustomer(db))
 		g.POST("/customers/:id/transfer", handler.TransferCustomer(db))
 
+		g.GET("/map/customers", handler.CustomerDistribution(db))
+		g.GET("/map/unregistered", handler.UnregisteredStores(db))
+		g.GET("/markers/:id", handler.GetMarker(db))
+
 		g.GET("/special-stock-requests", handler.ListSpecialStockRequests(db))
 		g.GET("/blacklist", handler.ListBlacklist(db))
 	}
@@ -134,7 +138,13 @@ func registerCSRoutes(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		g.POST("/reviews/:id/reply", handler.ReplyCSReview(db))
 
 		g.GET("/feedbacks", handler.ListCSFeedbacks(db))
+		g.PUT("/feedbacks/:id/process", handler.ProcessCSFeedback(db))
+
 		g.GET("/invoices", handler.ListCSInvoices(db))
+		g.GET("/invoices/:id", handler.GetCSInvoice(db))
+		g.PUT("/invoices/:id/approve", handler.ApproveCSInvoice(db))
+		g.PUT("/invoices/:id/issue", handler.IssueCSInvoice(db))
+		g.PUT("/invoices/:id/void", handler.VoidCSInvoice(db))
 	}
 }
 
@@ -295,7 +305,10 @@ func registerSupplierRoutes(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	{
 		g.GET("/orders", handler.ListSupplierOrders(db))
 		g.GET("/orders/:id", handler.GetSupplierOrder(db))
+		g.PUT("/orders/:id/confirm", handler.ConfirmSupplierOrder(db))
 		g.PUT("/orders/:id/ship", handler.ShipSupplierOrder(db))
+		g.POST("/shipping", handler.CreateSupplierShipment(db))
 		g.GET("/reconciliation", handler.ListSupplierReconciliations(db))
+		g.PUT("/reconciliation/:id/confirm", handler.ConfirmSupplierReconciliation(db))
 	}
 }

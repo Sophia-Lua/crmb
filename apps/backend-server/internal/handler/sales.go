@@ -367,3 +367,65 @@ func ListBlacklist(db *gorm.DB) gin.HandlerFunc {
 		c.JSON(http.StatusOK, paginatedResult([]interface{}{}, 0, 1, 20))
 	}
 }
+
+func CustomerDistribution(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if db == nil {
+			c.JSON(http.StatusOK, gin.H{"code": 200, "message": "success", "data": gin.H{"markers": []interface{}{}, "total": 0}})
+			return
+		}
+		customerType := c.Query("type")
+		status := c.Query("status")
+		q := db.Model(&model.Customer{}).Select("id, customer_name as name, address, latitude, longitude, customer_type as type, assigned_to as assignedTo")
+		if customerType != "" {
+			q = q.Where("customer_type = ?", customerType)
+		}
+		if status != "" {
+			q = q.Where("status = ?", status)
+		}
+		var markers []gin.H
+		q.Find(&markers)
+		c.JSON(http.StatusOK, gin.H{"code": 200, "message": "success", "data": gin.H{"markers": markers, "total": len(markers)}})
+	}
+}
+
+func UnregisteredStores(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if db == nil {
+			c.JSON(http.StatusOK, gin.H{"code": 200, "message": "success", "data": gin.H{"markers": []interface{}{}, "total": 0}})
+			return
+		}
+		var markers []gin.H
+		db.Model(&model.Store{}).Where("status = ?", "unclaimed").Select("id, store_name as name, address, latitude, longitude, 'unregistered' as type").Find(&markers)
+		c.JSON(http.StatusOK, gin.H{"code": 200, "message": "success", "data": gin.H{"markers": markers, "total": len(markers)}})
+	}
+}
+
+func GetMarker(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		markerType := c.Query("type")
+		if db == nil {
+			c.JSON(http.StatusNotFound, gin.H{"code": 404, "message": "Marker not found"})
+			return
+		}
+		switch markerType {
+		case "customer":
+			var customer model.Customer
+			if db.Where("id = ?", id).First(&customer).Error != nil {
+				c.JSON(http.StatusNotFound, gin.H{"code": 404, "message": "Customer not found"})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"code": 200, "message": "success", "data": customer})
+		case "store":
+			var store model.Store
+			if db.Where("id = ?", id).First(&store).Error != nil {
+				c.JSON(http.StatusNotFound, gin.H{"code": 404, "message": "Store not found"})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"code": 200, "message": "success", "data": store})
+		default:
+			c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "invalid marker type"})
+		}
+	}
+}

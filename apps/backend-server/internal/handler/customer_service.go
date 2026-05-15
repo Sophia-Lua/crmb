@@ -262,3 +262,77 @@ func ListCSInvoices(db *gorm.DB) gin.HandlerFunc {
 		c.JSON(http.StatusOK, paginatedResult([]interface{}{}, 0, 1, 20))
 	}
 }
+
+func GetCSInvoice(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		if db == nil {
+			c.JSON(http.StatusNotFound, gin.H{"code": 404, "message": "Invoice not found"})
+			return
+		}
+		var invoice model.CSInvoice
+		if db.Where("id = ?", id).First(&invoice).Error != nil {
+			c.JSON(http.StatusNotFound, gin.H{"code": 404, "message": "Invoice not found"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"code": 200, "message": "success", "data": invoice})
+	}
+}
+
+func ApproveCSInvoice(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		var req struct {
+			Status string `json:"status"`
+		}
+		c.ShouldBindJSON(&req)
+		if req.Status == "" { req.Status = "approved" }
+		now := time.Now().Format(time.RFC3339)
+		if db != nil {
+			db.Model(&model.CSInvoice{}).Where("id = ?", id).Updates(gin.H{"status": req.Status, "approved_at": now})
+		}
+		c.JSON(http.StatusOK, gin.H{"code": 200, "message": "success", "data": gin.H{"id": id, "status": req.Status, "approvedAt": now}})
+	}
+}
+
+func IssueCSInvoice(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		now := time.Now().Format(time.RFC3339)
+		if db != nil {
+			db.Model(&model.CSInvoice{}).Where("id = ?", id).Updates(gin.H{"status": "issued", "issued_at": now})
+		}
+		c.JSON(http.StatusOK, gin.H{"code": 200, "message": "success", "data": gin.H{"id": id, "status": "issued", "issuedAt": now}})
+	}
+}
+
+func VoidCSInvoice(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		var req struct {
+			Reason string `json:"reason"`
+		}
+		c.ShouldBindJSON(&req)
+		now := time.Now().Format(time.RFC3339)
+		if db != nil {
+			db.Model(&model.CSInvoice{}).Where("id = ?", id).Updates(gin.H{"status": "void", "void_reason": req.Reason, "voided_at": now})
+		}
+		c.JSON(http.StatusOK, gin.H{"code": 200, "message": "success", "data": gin.H{"id": id, "status": "void", "reason": req.Reason, "voidedAt": now}})
+	}
+}
+
+func ProcessCSFeedback(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		var req struct {
+			Status     string `json:"status"`
+			ProcessResult string `json:"processResult"`
+		}
+		c.ShouldBindJSON(&req)
+		now := time.Now().Format(time.RFC3339)
+		if db != nil {
+			db.Model(&model.Feedback{}).Where("id = ?", id).Updates(gin.H{"status": req.Status, "process_result": req.ProcessResult, "processed_at": now})
+		}
+		c.JSON(http.StatusOK, gin.H{"code": 200, "message": "success", "data": gin.H{"id": id, "status": req.Status, "processedAt": now}})
+	}
+}
