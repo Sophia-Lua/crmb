@@ -33,7 +33,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const getUserInfo = async () => {
     try {
-      const res = await get('/auth/user-info')
+      const res = await get('/auth/userinfo')
       userInfo.value = res.data
       role.value = res.data.role
     } catch (error) {

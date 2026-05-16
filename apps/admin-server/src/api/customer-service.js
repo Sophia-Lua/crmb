@@ -33,7 +33,7 @@ export const getFeedbackStatistics = () => get('/customer-service/feedbacks/stat
 
 export const getInvoices = (params) => get('/customer-service/invoices', params)
 export const getInvoiceDetail = (id) => get(`/customer-service/invoices/${id}`)
-export const auditInvoice = (id, data) => put(`/customer-service/invoices/${id}/audit`, data)
+export const auditInvoice = (id, data) => put(`/customer-service/invoices/${id}/approve`, data)
 export const issueInvoice = (id) => put(`/customer-service/invoices/${id}/issue`)
 export const mailInvoice = (id, data) => put(`/customer-service/invoices/${id}/mail`, data)
 export const voidInvoice = (id, data) => put(`/customer-service/invoices/${id}/void`, data)

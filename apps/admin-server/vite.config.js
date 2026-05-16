@@ -17,10 +17,9 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:3001',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/api'),
       },
     },
-    allowedHosts: ['.monkeycode-ai.online'],
+    allowedHosts: ['3000-55f6b285cb153c8b.monkeycode-ai.online'],
   },
   build: {
     outDir: 'dist',

@@ -1,7 +1,7 @@
 <template>
   <el-container style="height: 100vh">
     <el-aside :width="isCollapse ? '64px' : '220px'" style="transition: width 0.3s; background: #304156">
-      <div style="height: 60px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; font-weight: bold; white-space: nowrap; overflow: hidden">
+      <div style="height: 60px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; font-weight: bold; white-space: nowrap">
         <span v-if="!isCollapse">CRMB 管理后台</span>
         <span v-else>C</span>
       </div>

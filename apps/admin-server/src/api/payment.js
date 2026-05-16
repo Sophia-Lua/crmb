@@ -9,12 +9,12 @@ export const manageSettlementAccount = (id, data) => put(`/payment/merchants/${i
 
 export const getReceipts = (params) => get('/payment/receipts', params)
 export const getReceiptDetail = (id) => get(`/payment/receipts/${id}`)
-export const dailyReconciliation = (data) => post('/payment/reconciliation/daily', data)
-export const monthlyReconciliation = (data) => post('/payment/reconciliation/monthly', data)
-export const markAbnormalReceipt = (id, data) => put(`/payment/receipts/${id}/abnormal`, data)
+export const dailyReconciliation = () => get('/payment/receipts/daily-summary')
+export const monthlyReconciliation = () => get('/payment/receipts/monthly-summary')
+export const markAbnormalReceipt = (id, data) => put(`/payment/receipts/${id}/mark-abnormal`, data)
 export const processAbnormal = (id, data) => put(`/payment/receipts/${id}/process-abnormal`, data)
 
 export const getSettlementConfig = () => get('/payment/settlement/config')
 export const getSettlementReports = (params) => get('/payment/settlement/reports', params)
 export const executeSettlement = (data) => post('/payment/settlement/execute', data)
-export const notifySettlement = (id) => post(`/payment/settlement/${id}/notify`)
+export const notifySettlement = () => post('/payment/settlement/notify')

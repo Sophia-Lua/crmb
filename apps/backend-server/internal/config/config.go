@@ -37,8 +37,8 @@ type RedisConfig struct {
 }
 
 type JWTConfig struct {
-	Secret      string
-	ExpireHours int
+	Secret      string `mapstructure:"secret"`
+	ExpireHours int    `mapstructure:"expire_hours"`
 }
 
 type MinIOConfig struct {

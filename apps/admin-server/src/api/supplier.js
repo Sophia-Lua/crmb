@@ -10,7 +10,7 @@ export const inputLogistics = (id, data) => put(`/supplier/shipping/${id}/logist
 export const trackShipping = (id) => get(`/supplier/shipping/${id}/track`)
 export const handleShippingException = (id, data) => put(`/supplier/shipping/${id}/exception`, data)
 
-export const getMonthlyReconciliation = (params) => get('/supplier/reconciliation/monthly', params)
+export const getMonthlyReconciliation = (params) => get('/supplier/reconciliation', params)
 export const processReconciliationDifference = (id, data) => put(`/supplier/reconciliation/${id}/difference`, data)
 export const confirmReconciliation = (id) => put(`/supplier/reconciliation/${id}/confirm`)
 export const queryPaymentProgress = (id) => get(`/supplier/reconciliation/${id}/payment`)

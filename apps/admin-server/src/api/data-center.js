@@ -1,6 +1,6 @@
 import { get, post, put } from '@/api/request'
 
-export const queryData = (params) => get('/data-center/query', params)
+export const queryData = (data) => post('/data-center/query', data)
 export const getRealtimeData = (params) => get('/data-center/realtime', params)
 export const getHistoryData = (params) => get('/data-center/history', params)
 
@@ -11,6 +11,6 @@ export const getChannelAnalysis = (params) => get('/data-center/analysis/channel
 
 export const getReportTemplates = () => get('/data-center/report/templates')
 export const generateReport = (data) => post('/data-center/report/generate', data)
-export const exportReport = (id, data) => post(`/data-center/report/${id}/export`, data)
-export const getAutoExportConfig = () => get('/data-center/report/auto-export')
-export const updateAutoExportConfig = (data) => put('/data-center/report/auto-export', data)
+export const exportReport = (id) => get(`/data-center/report/${id}/export`)
+export const getAutoExportConfig = () => get('/data-center/auto-export/config')
+export const updateAutoExportConfig = (data) => put('/data-center/auto-export/config', data)
